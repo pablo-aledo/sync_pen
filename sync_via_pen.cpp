@@ -897,8 +897,30 @@ void load_keep(){
 
 }
 
+void check_log(){
+
+	if(!exist_local_file("spdata/log.log")) return;
+	FILE *file = fopen ( "spdata/log.log", "r" );
+	char line [ 128 ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		string line_s = string(line);
+
+		if(line_s.substr(0,13) == "\e[32m cp \e[0m" && 
+		   line_s.substr(0,13) == "\e[33m mv \e[0m" &&
+		   line_s.substr(0,13) == "\e[31m rm \e[0m" ){
+			printf("\e[33m Incorrect log file \e[0m\n");
+		}
+	}
+	fclose ( file );
+
+	
+}
+
 int main(int argc, const char *argv[]){
 
+	check_log();
 	start_logging();
 	load_config();
 	load_ignores();
