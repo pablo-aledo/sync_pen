@@ -195,7 +195,12 @@ bool enough_space(){
 
 void cpfile(string src, string dst){
 	if(match_with_ignores(src)) return;
-	if(is_in_keep(dst)) return;
+	if(is_in_keep(dst)){
+		if(options["fastkeep"] == "true"){
+			cpfile(dst, "." + dst);
+		}
+		return;
+	}
 	printf("\e[32m cp \e[0m %s\n", src.c_str());
 	fprintf(log_file, "\e[32m cp \e[0m %s\n", src.c_str());
 	if(options["dry_run"] == "true") return;
@@ -209,7 +214,12 @@ void cpfile(string src, string dst){
 
 void mvfile(string src, string dst){
 	if(match_with_ignores(src)) return;
-	if(is_in_keep(dst)) return;
+	if(is_in_keep(dst)){
+		if(options["fastkeep"] == "true"){
+			cpfile(dst, "." + dst);
+		}
+		return;
+	}
 	printf("\e[33m mv \e[0m %s\n", src.c_str());
 	fprintf(log_file, "\e[33m mv \e[0m %s\n", src.c_str());
 	if(options["dry_run"] == "true") return;
@@ -225,7 +235,12 @@ void mvfile(string src, string dst){
 
 void rmfile(string file){
 	if(match_with_ignores(file)) return;
-	if(is_in_keep(file)) return;
+	if(is_in_keep(file)){
+		if(options["fastkeep"] == "true"){
+			cpfile(file, "." + file);
+		}
+		return;
+	}
 	printf("\e[31m rm \e[0m %s\n", file.c_str());
 	fprintf(log_file, "\e[31m rm \e[0m %s\n", file.c_str());
 	if(options["dry_run"] == "true") return;
@@ -838,6 +853,7 @@ void load_config(){
 	options["dry_run"] = "false";
 	options["noretry"] = "false";
 	options["noclean"] = "true";
+	options["fastkeep"] = "true";
 	//if(!exist_local_file("spdata/config")) return;
 	//FILE *file = fopen ( "spdata/config", "r" );
 	//char line [ SIZE_STR ]; [> or other suitable maximum line size <]
