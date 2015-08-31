@@ -842,7 +842,7 @@ void setup(string path){
 	} else if (!strcmp(input, "n")){
 		system("mkdir -p spdata");
 		system(("mkdir -p .\"" + path + "\"").c_str());
-		system(("sync -vai --delete \"" + path + "/\"" + " .\"" + path + "\"").c_str());
+		system(("rsync -vai --delete \"" + path + "/\"" + " .\"" + path + "\"").c_str());
 		dump_md5(compute_md5(path), path);
 	}
 
@@ -901,7 +901,7 @@ void check_log(){
 
 	if(!exist_local_file("spdata/log.log")) return;
 	FILE *file = fopen ( "spdata/log.log", "r" );
-	char line [ 128 ]; /* or other suitable maximum line size */
+	char line [ 1024 ]; /* or other suitable maximum line size */
 	
 	while ( fgets ( line, sizeof(line), file ) != NULL ){
 		trim(line);
@@ -911,6 +911,7 @@ void check_log(){
 		   line_s.substr(0,13) != "\e[33m mv \e[0m" &&
 		   line_s.substr(0,13) != "\e[31m rm \e[0m" ){
 			printf("\e[33m Incorrect log file \e[0m\n");
+			exit(-1);
 		}
 	}
 	fclose ( file );
@@ -964,6 +965,10 @@ int main(int argc, const char *argv[]){
 			setup(path);
 		} else if(selection == "md5s"){
 			dump_md5(compute_md5(path), path);
+		} else if(selection == "retry"){
+			map<string, string> retries = load_retries(); // file, id
+			retry(retries, path);
+			save_retries(retries);
 		}
 	}
 
