@@ -26,3 +26,6 @@
 *.exe
 *.out
 *.app
+
+# Target
+sync_via_pen

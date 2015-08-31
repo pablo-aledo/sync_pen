@@ -193,7 +193,19 @@ bool enough_space(){
 
 }
 
+void tox_and_detox(string& filename){
+	if(filename[0] == '.'){
+		myReplace(filename, ":", "%colon%" );
+		myReplace(filename, "?", "%question%" );
+	} else {
+		myReplace(filename, "%colon%", ":" );
+		myReplace(filename, "%question%", "?" );
+	}
+}
+
 void cpfile(string src, string dst){
+	tox_and_detox(src);
+	tox_and_detox(dst);
 	if(match_with_ignores(src)) return;
 	if(is_in_keep(dst)){
 		if(options["fastkeep"] == "true"){
@@ -213,6 +225,8 @@ void cpfile(string src, string dst){
 }
 
 void mvfile(string src, string dst){
+	tox_and_detox(src);
+	tox_and_detox(dst);
 	if(match_with_ignores(src)) return;
 	if(is_in_keep(dst)){
 		if(options["fastkeep"] == "true"){
@@ -234,6 +248,7 @@ void mvfile(string src, string dst){
 }
 
 void rmfile(string file){
+	tox_and_detox(file);
 	if(match_with_ignores(file)) return;
 	if(is_in_keep(file)){
 		if(options["fastkeep"] == "true"){
