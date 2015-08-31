@@ -139,7 +139,19 @@ void mkfolder(string path){
 	system(("mkdir -p \"" + path + "\"").c_str());
 }
 
+void tox_and_detox(string& filename){
+	if(filename[0] == '.'){
+		myReplace(filename, ":", "%colon%" );
+		myReplace(filename, "?", "%question%" );
+	} else {
+		myReplace(filename, "%colon%", ":" );
+		myReplace(filename, "%question%", "?" );
+	}
+}
+
 bool exist_local_file(string path){
+
+	tox_and_detox(path);
 
 	descape(path);
 	return access(path.c_str(), F_OK ) != -1;
@@ -191,16 +203,6 @@ bool enough_space(){
 	return stoi(string(line)) > 50000;
 	
 
-}
-
-void tox_and_detox(string& filename){
-	if(filename[0] == '.'){
-		myReplace(filename, ":", "%colon%" );
-		myReplace(filename, "?", "%question%" );
-	} else {
-		myReplace(filename, "%colon%", ":" );
-		myReplace(filename, "%question%", "?" );
-	}
 }
 
 void cpfile(string src, string dst){
