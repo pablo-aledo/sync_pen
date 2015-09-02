@@ -1016,17 +1016,23 @@ int main(int argc, const char *argv[]){
 		printf("Path \e[34m%s\e[0m\n", path.c_str());
 
 		if(selection == "start"){
+			do_compress(path);
 			start_working(path);
 			do_uncompress(path);
 		} else if(selection == "end"){
 			do_compress(path);
 			end_working(path);
+			do_uncompress(path);
 		} else if(selection == "drystart"){
 			options["dry_run"] = "true";
+			do_compress(path);
 			start_working(path);
+			do_uncompress(path);
 		} else if(selection == "dryend"){
 			options["dry_run"] = "true";
+			do_compress(path);
 			end_working(path);
+			do_uncompress(path);
 		} else if(selection == "setup"){
 			setup(path);
 		} else if(selection == "md5s"){
