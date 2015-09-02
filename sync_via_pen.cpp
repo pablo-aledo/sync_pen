@@ -180,6 +180,18 @@ bool is_in_keep(string filename){
 	return keep.find(filename) != keep.end();
 }
 
+bool is_in_compress(string filename, string path){
+	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
+		string path_prefix = path + "/" + *it;
+		string filename_prefix = filename.substr(0, prefix.length());
+		//printf("%s\n", (prefix).c_str() );
+		//printf("%s\n", filename.substr(0, prefix.length()).c_str() );
+		if(path_prefix == filename_prefix) return true;
+	}
+
+	return true;
+}
+
 int stoi(string str){
 	int ret;
 	sscanf(str.c_str(), "%d", &ret);
@@ -727,6 +739,7 @@ void start_working(string path){
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, remote_md5 );
 
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
+		if( is_in_compress(filename,path) )                                                                                       { continue; }
 		if( exist_copy && remote_md5 == local_md5 && !still_other_different && myid != lastid)                                    { rmfile("." + filename); continue; }
 		if( exist_remote && exist_local && remote_md5 == local_md5 )                                                              { continue; }
 		if( !exist_remote && exist_local )                                                                                        { rmfile(filename); continue; }
@@ -832,6 +845,7 @@ void end_working(string path){
 
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, local_md5);
 
+		if( is_in_compress(filename,path) )                                                            { continue; }
 		if( still_other_different && modified_after_epoch(filename, epoch_last_end))                   { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( !exist_remote && modified_after_epoch(filename, epoch_last_end))                           { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( exist_remote && local_md5 != remote_md5 && modified_after_epoch(filename, epoch_last_end)) { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
@@ -990,6 +1004,9 @@ int main(int argc, const char *argv[]){
 	load_ignores();
 	load_keep();
 	load_compress();
+
+	printf("is_in_compress %d\n", is_in_compress("/media/DATA/Work/forest/disk/release/goanna_dblfree_falsenegatives.html", "/media/DATA/Work/forest"));
+	exit(0);
 
 	string selection;
 	vector<string> paths;
