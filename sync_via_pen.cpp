@@ -37,6 +37,7 @@ FILE* log_file;
 map<string, string> options;
 set<string> ignores;
 set<string> keep;
+set<string> compress;
 
 bool match_with_ignores(string line){
 
@@ -914,6 +915,21 @@ void load_keep(){
 
 }
 
+void load_compress(){
+	if(!exist_local_file("spdata/compress")) return;
+
+	FILE *file = fopen ( "spdata/compress", "r" );
+	char line [ SIZE_STR ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		compress.insert(string(line));
+		
+	}
+	fclose ( file );
+
+}
+
 void check_log(){
 
 	if(!exist_local_file("spdata/log.log")) return;
@@ -936,6 +952,36 @@ void check_log(){
 	
 }
 
+void do_compress(string path){
+
+	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
+		string compress_prefix = *it;
+		stringstream command;
+		string filename = "spcompress_" + compress_prefix + ".tar.gz";
+		myReplace(filename, "/", "_");
+		command << "cd " << path << ";";
+		command << "tar -czf " << filename << " " << compress_prefix << " && ";
+		command << "rm -rf " << compress_prefix << ";";
+		system(command.str().c_str());
+	}
+}
+
+
+
+void do_uncompress(string path){
+
+	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
+		string compress_prefix = *it;
+		stringstream command;
+		string filename = "spcompress_" + compress_prefix + ".tar.gz";
+		myReplace(filename, "/", "_");
+		command << "cd " << path << ";";
+		command << "tar -xzf " << filename << " && ";
+		command << "rm " << filename;
+		system(command.str().c_str());
+	}
+}
+
 int main(int argc, const char *argv[]){
 
 	check_log();
@@ -943,6 +989,7 @@ int main(int argc, const char *argv[]){
 	load_config();
 	load_ignores();
 	load_keep();
+	load_compress();
 
 	string selection;
 	vector<string> paths;
@@ -970,7 +1017,9 @@ int main(int argc, const char *argv[]){
 
 		if(selection == "start"){
 			start_working(path);
+			do_uncompress(path);
 		} else if(selection == "end"){
+			do_compress(path);
 			end_working(path);
 		} else if(selection == "drystart"){
 			options["dry_run"] = "true";
