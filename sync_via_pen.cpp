@@ -183,13 +183,13 @@ bool is_in_keep(string filename){
 bool is_in_compress(string filename, string path){
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
 		string path_prefix = path + "/" + *it;
-		string filename_prefix = filename.substr(0, prefix.length());
+		string filename_prefix = filename.substr(0, path_prefix.length());
 		//printf("%s\n", (prefix).c_str() );
 		//printf("%s\n", filename.substr(0, prefix.length()).c_str() );
 		if(path_prefix == filename_prefix) return true;
 	}
 
-	return true;
+	return false;
 }
 
 int stoi(string str){
@@ -974,13 +974,10 @@ void do_compress(string path){
 		string filename = "spcompress_" + compress_prefix + ".tar.gz";
 		myReplace(filename, "/", "_");
 		command << "cd " << path << ";";
-		command << "tar -czf " << filename << " " << compress_prefix << " && ";
-		command << "rm -rf " << compress_prefix << ";";
+		command << "tar -czf " << filename << " " << compress_prefix << ";";
 		system(command.str().c_str());
 	}
 }
-
-
 
 void do_uncompress(string path){
 
@@ -990,6 +987,8 @@ void do_uncompress(string path){
 		string filename = "spcompress_" + compress_prefix + ".tar.gz";
 		myReplace(filename, "/", "_");
 		command << "cd " << path << ";";
+		command << "[ -e " << filename << " ] && ";
+		command << "rm -rf " << compress_prefix << " && ";
 		command << "tar -xzf " << filename << " && ";
 		command << "rm " << filename;
 		system(command.str().c_str());
@@ -1005,8 +1004,8 @@ int main(int argc, const char *argv[]){
 	load_keep();
 	load_compress();
 
-	printf("is_in_compress %d\n", is_in_compress("/media/DATA/Work/forest/disk/release/goanna_dblfree_falsenegatives.html", "/media/DATA/Work/forest"));
-	exit(0);
+	//printf("is_in_compress %d\n", is_in_compress("/media/DATA/Work/forest/disk/release/goanna_dblfree_falsenegatives.html", "/media/DATA/Work/forest"));
+	//exit(0);
 
 	string selection;
 	vector<string> paths;
