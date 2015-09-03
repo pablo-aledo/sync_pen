@@ -966,9 +966,34 @@ void check_log(){
 	
 }
 
+bool something_modified_after(string path, string prefix, string file){
+
+	FILE *fp;
+	stringstream command;
+	char ret[SIZE_STR];
+	
+	command << "find " << path << "/" << prefix << " -newer " << file;
+	
+	fp = popen(command.str().c_str(), "r");
+	
+	if(fgets(ret,SIZE_STR, fp) != NULL){
+		pclose(fp);
+		return true;
+	} else {
+		pclose(fp);
+		return false;
+	}
+	
+	
+}
+
 void do_compress(string path){
 
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
+
+		if(!something_modified_after(path, *it, "spdata/md5_remote_" + crc(path)+ "_" + unique_id() )){
+			continue;
+		}
 		string compress_prefix = *it;
 		stringstream command;
 		string filename = "spcompress_" + compress_prefix + ".tar.gz";
@@ -1004,9 +1029,6 @@ int main(int argc, const char *argv[]){
 	load_keep();
 	load_compress();
 
-	//printf("is_in_compress %d\n", is_in_compress("/media/DATA/Work/forest/disk/release/goanna_dblfree_falsenegatives.html", "/media/DATA/Work/forest"));
-	//exit(0);
-
 	string selection;
 	vector<string> paths;
 
@@ -1038,7 +1060,7 @@ int main(int argc, const char *argv[]){
 		} else if(selection == "end"){
 			do_compress(path);
 			end_working(path);
-			do_uncompress(path);
+			//do_uncompress(path);
 		} else if(selection == "drystart"){
 			options["dry_run"] = "true";
 			do_compress(path);
