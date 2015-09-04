@@ -442,7 +442,9 @@ map<string,string> compute_md5_slow(string dir){
 	return ret;
 }
 
-map<string,string> load_compress_md5s(string dir){
+map<string,string> compress_md5s;
+
+void load_compress_md5s(string dir){
 
 	map<string, string> ret;
 	FILE *file = fopen ( ("spdata/md5_remote_" + crc(dir) + "_" + unique_id()).c_str(), "r" );
@@ -460,11 +462,9 @@ map<string,string> load_compress_md5s(string dir){
 		string md5 = string(line).substr(0, string(line).find(" "));
 		string file = string(line).substr(string(line).find(" ") + 2);
 
-		ret[file] = string(md5);
+		compress_md5s[file] = string(md5);
 	}
 	fclose ( file );
-
-	return ret;
 }
 
 
@@ -478,12 +478,12 @@ void add_to_md5(map<string, string>& map1, map<string, string> map2){
 
 map<string,string> compute_md5(string dir){
 
-	map<string, string> ret = load_compress_md5s(dir);
+	load_compress_md5s(dir);
 
 	if(options["fast_md5"] == "true" && exist_local_file("spdata/md5_remote_" + crc(dir) + "_" + unique_id()))
-		add_to_md5(ret, compute_md5_fast(dir));
+		return compute_md5_fast(dir);
 	else
-		add_to_md5(ret, compute_md5_slow(dir));
+		return compute_md5_slow(dir);
 
 }
 
@@ -542,6 +542,8 @@ void set_my_md5_last(){
 void dump_md5(map<string, string> md5s, string path){
 
 	if(options["dry_run"] == "true") return;
+
+	add_to_md5(md5s, compress_md5s);
 
 	FILE* file = fopen(("spdata/md5_remote_" + crc(path) + "_" + unique_id()).c_str(), "w");
 	for( map<string,string>::iterator it = md5s.begin(); it != md5s.end(); it++ ){
