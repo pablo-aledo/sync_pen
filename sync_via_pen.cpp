@@ -184,8 +184,8 @@ bool is_in_compress(string filename, string path){
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
 		string path_prefix = path + "/" + *it;
 		string filename_prefix = filename.substr(0, path_prefix.length());
-		//printf("%s\n", (prefix).c_str() );
-		//printf("%s\n", filename.substr(0, prefix.length()).c_str() );
+		//printf("%s\n", (path_prefix).c_str() );
+		//printf("%s\n", filename.substr(0, path_prefix.length()).c_str() );
 		if(path_prefix == filename_prefix) return true;
 	}
 
@@ -972,7 +972,7 @@ bool something_modified_after(string path, string prefix, string file){
 	stringstream command;
 	char ret[SIZE_STR];
 	
-	command << "find " << path << "/" << prefix << " -newer " << file;
+	command << "find " << path << "/" << prefix << " -newer " << file << " 2>/dev/null";
 	
 	fp = popen(command.str().c_str(), "r");
 	
@@ -1060,7 +1060,7 @@ int main(int argc, const char *argv[]){
 		} else if(selection == "end"){
 			do_compress(path);
 			end_working(path);
-			//do_uncompress(path);
+			do_uncompress(path);
 		} else if(selection == "drystart"){
 			options["dry_run"] = "true";
 			do_compress(path);
