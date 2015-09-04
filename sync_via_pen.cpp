@@ -421,11 +421,7 @@ bool different_md5(string filename1, string filename2){
 	return md5_of_file(filename1) != md5_of_file(filename2);
 }
 
-map<string,string> compute_md5(string dir){
-
-	if(options["fast_md5"] == "true" && exist_local_file("spdata/md5_remote_" + crc(dir) + "_" + unique_id()))
-		return compute_md5_fast(dir);
-
+map<string,string> compute_md5_slow(string dir){
 	map<string, string> ret;
 	
 	//printf("Computing MD5's ... "); fflush(stdout);
@@ -444,6 +440,51 @@ map<string,string> compute_md5(string dir){
 	//printf("DONE\n");
 
 	return ret;
+}
+
+map<string,string> load_compress_md5s(string dir){
+
+	map<string, string> ret;
+	FILE *file = fopen ( ("spdata/md5_remote_" + crc(dir) + "_" + unique_id()).c_str(), "r" );
+	char line [ SIZE_STR ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+
+		if(!strstr(line, "spcompress"))
+			continue;
+
+		if( exist_local_file(line) )
+			continue;
+
+		string md5 = string(line).substr(0, string(line).find(" "));
+		string file = string(line).substr(string(line).find(" ") + 2);
+
+		ret[file] = string(md5);
+	}
+	fclose ( file );
+
+	return ret;
+}
+
+
+void add_to_md5(map<string, string>& map1, map<string, string> map2){
+
+	for( map<string,string>::iterator it = map2.begin(); it != map2.end(); it++ ){
+		map1[it->first] = it->second;
+	}
+
+}
+
+map<string,string> compute_md5(string dir){
+
+	map<string, string> ret = load_compress_md5s(dir);
+
+	if(options["fast_md5"] == "true" && exist_local_file("spdata/md5_remote_" + crc(dir) + "_" + unique_id()))
+		add_to_md5(ret, compute_md5_fast(dir));
+	else
+		add_to_md5(ret, compute_md5_slow(dir));
+
 }
 
 void clean(string path){
