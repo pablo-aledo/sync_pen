@@ -1105,7 +1105,12 @@ int main(int argc, const char *argv[]){
 	for( vector<string>::iterator it = paths.begin(); it != paths.end(); it++ ){
 		string path=*it;
 
-		printf("Path \e[34m%s\e[0m\n", path.c_str());
+		if(exist_local_file(*it)){
+			printf("Path \e[34m%s\e[0m\n", path.c_str());
+		} else {
+			printf("\e[31mSkipping %s\e[0m\n", path.c_str());
+			continue;
+		}
 
 		if(selection == "start"){
 			do_compress(path);
