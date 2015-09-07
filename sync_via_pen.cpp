@@ -322,6 +322,9 @@ string unique_id(){
 map<string,string> load_md5(string filename){
 
 	map<string, string> ret;
+
+	if(!exist_local_file(filename.c_str())) return ret;
+
 	FILE *file = fopen ( filename.c_str(), "r" );
 	char line [ SIZE_STR ]; /* or other suitable maximum line size */
 	
@@ -447,7 +450,9 @@ map<string,string> compress_md5s;
 void load_compress_md5s(string dir){
 
 	map<string, string> ret;
-	FILE *file = fopen ( ("spdata/md5_remote_" + crc(dir) + "_" + unique_id()).c_str(), "r" );
+	string filename = "spdata/md5_remote_" + crc(dir) + "_" + unique_id();
+	if(!exist_local_file(filename.c_str())) return;
+	FILE *file = fopen ( filename.c_str(), "r" );
 	char line [ SIZE_STR ]; /* or other suitable maximum line size */
 	
 	while ( fgets ( line, sizeof(line), file ) != NULL ){
