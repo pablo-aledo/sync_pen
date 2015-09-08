@@ -1074,6 +1074,18 @@ void do_uncompress(string path){
 	}
 }
 
+void do_removecompressed(string path){
+	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
+		string compress_prefix = *it;
+		stringstream command;
+		string filename = "spcompress_" + compress_prefix + ".tar.gz";
+		myReplace(filename, "/", "_");
+		command << "cd " << path << ";";
+		command << "rm -f " << filename;
+		system(command.str().c_str());
+	}
+}
+
 int main(int argc, const char *argv[]){
 
 	check_log();
@@ -1119,7 +1131,7 @@ int main(int argc, const char *argv[]){
 		} else if(selection == "end"){
 			do_compress(path);
 			end_working(path);
-			do_uncompress(path);
+			do_removecompressed(path);
 		} else if(selection == "drystart"){
 			options["dry_run"] = "true";
 			do_compress(path);
