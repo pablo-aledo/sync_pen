@@ -627,6 +627,7 @@ void retry(map<string,string>& retries, string path){
 			actualize_retries("." + filename, retries, myid);
 			if(retries.size() < pre_size){
 				it--;
+				continue;
 			}
 			if(!retries.size())
 				break;
@@ -860,10 +861,10 @@ bool modified_after_epoch(string filename, unsigned long time ){
 	return mtime1 > time || mtime2 > time;
 }
 
-map<string, string> filter_retries(map<string, string> retries, string path){
+map<string, string> filter_retries(map<string, string> retries, string path, string myid){
 	map<string, string> ret;
 	for( map<string,string>::iterator it = retries.begin(); it != retries.end(); it++ ){
-		if(is_in_path(it->first, path)){
+		if(is_in_path(it->first, path) && it->second == myid){
 			ret[it->first] = it->second;
 		}
 	}
@@ -905,7 +906,7 @@ void end_working(string path){
 
 	}
 
-	if(filter_retries(retries, path).size()){
+	if(filter_retries(retries, path, myid).size()){
 		printf("\e[33m Warning: Not all files could be copied !! \e[0m\n");
 	}
 
