@@ -728,7 +728,7 @@ string get_zenity_selection(){
 	stringstream command;
 	char ret[SIZE_STR];
 	
-	command << "(echo start; echo end;) | zenity --list --column=option 2>/dev/null";
+	command << "(echo start; echo end; echo drystart;) | zenity --list --column=option 2>/dev/null";
 	
 	fp = popen(command.str().c_str(), "r");
 	
