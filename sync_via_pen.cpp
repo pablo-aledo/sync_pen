@@ -38,6 +38,7 @@ map<string, string> options;
 set<string> ignores;
 set<string> keep;
 set<string> compress;
+map<string,string> compress_md5s;
 
 bool match_with_ignores(string line){
 
@@ -223,7 +224,7 @@ void cpfile(string src, string dst){
 	tox_and_detox(dst);
 	if(match_with_ignores(src)) return;
 	if(is_in_keep(dst)){
-		if(options["fastkeep"] == "true"){
+		if(options["fastkeep"] == "true" && exist_local_file(dst) ){
 			cpfile(dst, "." + dst);
 		}
 		return;
@@ -244,7 +245,7 @@ void mvfile(string src, string dst){
 	tox_and_detox(dst);
 	if(match_with_ignores(src)) return;
 	if(is_in_keep(dst)){
-		if(options["fastkeep"] == "true"){
+		if(options["fastkeep"] == "true" && exist_local_file(dst) ){
 			cpfile(dst, "." + dst);
 		}
 		return;
@@ -266,7 +267,7 @@ void rmfile(string file){
 	tox_and_detox(file);
 	if(match_with_ignores(file)) return;
 	if(is_in_keep(file)){
-		if(options["fastkeep"] == "true"){
+		if(options["fastkeep"] == "true" && exist_local_file(file) ){
 			cpfile(file, "." + file);
 		}
 		return;
@@ -445,8 +446,6 @@ map<string,string> compute_md5_slow(string dir){
 	return ret;
 }
 
-map<string,string> compress_md5s;
-
 void load_compress_md5s(string dir){
 
 	map<string, string> ret;
@@ -454,6 +453,7 @@ void load_compress_md5s(string dir){
 	if(!exist_local_file(filename.c_str())) return;
 	FILE *file = fopen ( filename.c_str(), "r" );
 	char line [ SIZE_STR ]; /* or other suitable maximum line size */
+	compress_md5s.clear();
 	
 	while ( fgets ( line, sizeof(line), file ) != NULL ){
 		trim(line);
@@ -471,7 +471,6 @@ void load_compress_md5s(string dir){
 	}
 	fclose ( file );
 }
-
 
 void add_to_md5(map<string, string>& map1, map<string, string> map2){
 
@@ -1157,6 +1156,7 @@ int main(int argc, const char *argv[]){
 	end_logging();
 
 	return 0;
+
 
 
 }
