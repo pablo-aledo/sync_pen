@@ -39,6 +39,7 @@ set<string> ignores;
 set<string> keep;
 set<string> compress;
 map<string,string> compress_md5s;
+bool notify_end = false;
 
 bool match_with_ignores(string line){
 
@@ -1101,6 +1102,7 @@ int main(int argc, const char *argv[]){
 	if(argc == 1){
 		selection = get_zenity_selection();
 		paths = get_paths_from_file();
+		notify_end = true;
 	} 
 
 	if(argc == 2){
@@ -1155,6 +1157,10 @@ int main(int argc, const char *argv[]){
 
 	set_my_md5_last();
 	end_logging();
+
+	if(notify_end){
+		system("zenity --notification --text 'sync_via_pen finished'");
+	}
 
 	return 0;
 
