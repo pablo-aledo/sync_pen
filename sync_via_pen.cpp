@@ -606,7 +606,7 @@ bool is_in_path(string filename, string path){
 }
 
 void retry(map<string,string>& retries, string path){
-
+	map<string,string> retries_at_end;
 	if(options["noretry"] == "true") return;
 
 	if(retries.size())
@@ -616,23 +616,17 @@ void retry(map<string,string>& retries, string path){
 	for( map<string,string>::iterator it = retries.begin(); it != retries.end(); it++ ){
 		string filename = it->first;
 		if( !exist_local_file(filename) && it->second == myid){
-			retries.erase(it);
-			it--;
 			continue;
 		}
 
 		if( is_in_path(filename, path) && it->second == myid){
 			cpfile(filename, "." + filename);
-
-			int pre_size = retries.size();
-			actualize_retries("." + filename, retries, myid);
-			if(retries.size() < pre_size){
-				it--;
-			}
-			if(!retries.size())
-				break;
+			if(!exist_local_file("." + filename))
+				retries_at_end[filename] = myid;
 		}
 	}
+
+	retries = retries_at_end;
 }
 
 map<string, map<string, string> > load_md5s(string path, set<string> computers){ // file, idcomputer, md5
