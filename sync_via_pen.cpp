@@ -628,7 +628,6 @@ void retry(map<string,string>& retries, string path){
 			actualize_retries("." + filename, retries, myid);
 			if(retries.size() < pre_size){
 				it--;
-				continue;
 			}
 			if(!retries.size())
 				break;
