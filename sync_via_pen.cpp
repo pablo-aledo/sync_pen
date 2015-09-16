@@ -711,7 +711,7 @@ void clean(string path){
 	stringstream command;
 	char ret[SIZE_STR];
 	
-	command << "find " << ".\"" + path + "\" -type f";
+	command << "find " << ".\"" + path + "\" -type f 2>/dev/null";
 	
 	fp = popen(command.str().c_str(), "r");
 	
@@ -728,11 +728,11 @@ void clean(string path){
 	pclose(fp);
 	
 	for ( unsigned int i = 0; i < 10; i++) {
-		system(("find .\"" + path + "\" -type d -empty -delete 2>/dev/null").c_str());
+		system(("find .\"" + path + "\" -mindepth 1 -type d -empty -delete 2>/dev/null").c_str());
 	}
 
 	command.str("");
-	command << "find " << "\"" + path + "\" -mindepth 1 -type d -empty";
+	command << "find " << "\"" + path + "\" -mindepth 1 -type d -empty 2>/dev/null";
 	
 	fp = popen(command.str().c_str(), "r");
 	
@@ -748,7 +748,7 @@ void clean(string path){
 		}
 		
 		if( !is_in_compress ){
-			system(("rmdir " + folder).c_str());
+			system(("rmdir \"" + folder + "\"").c_str());
 		}
 
 	}
@@ -940,7 +940,7 @@ void end_working(string path){
 
 	}
 
-	if(filter_retries(retries, path, myid).size()){
+	if(filter_retries(retries, path, myid).size() && options["dry_run"] == "false"){
 		printf("\e[33m Warning: Not all files could be copied !! \e[0m\n");
 	}
 
