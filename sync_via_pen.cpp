@@ -740,15 +740,7 @@ void clean(string path){
 	while (fgets(ret,SIZE_STR, fp) != NULL){
 		trim(ret);
 		string folder = string(ret);
-		bool is_in_compress = false;
-		for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
-			if(is_in_path(folder, *it)){
-				is_in_compress = true;
-				break;
-			}
-		}
-		
-		if( !is_in_compress ){
+		if( !is_in_compress(folder, path) ){
 			system(("rmdir \"" + folder + "\"").c_str());
 		}
 
