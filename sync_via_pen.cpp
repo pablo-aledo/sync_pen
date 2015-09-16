@@ -916,7 +916,7 @@ void fastrm(string path){
 		trim(ret);
 		string ret_s = string(ret);
 		string filename = ret_s.substr(1);
-		if( !exist_local_file(filename) ){
+		if( !exist_local_file(filename) && filename.find("spcompress_") == string::npos ){
 			rmfile("." + filename);
 		}
 
