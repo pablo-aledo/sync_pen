@@ -908,6 +908,32 @@ map<string, string> filter_retries(map<string, string> retries, string path, str
 	
 }
 
+void fastrm(string path){
+
+	if(options["fastrm"] == "false") return;
+
+	FILE *fp;
+	stringstream command;
+	char ret[SIZE_STR];
+	
+	command << "find " << ".\"" + path + "\" -type f 2>/dev/null";
+	
+	fp = popen(command.str().c_str(), "r");
+	
+	while (fgets(ret,SIZE_STR, fp) != NULL){
+		trim(ret);
+		string ret_s = string(ret);
+		string filename = ret_s.substr(1);
+		if( !exist_local_file(filename) ){
+			rmfile("." + filename);
+		}
+
+	}
+	
+	pclose(fp);
+
+}
+
 void end_working(string path){
 
 	map<string, string> retries = load_retries();
@@ -918,6 +944,8 @@ void end_working(string path){
 	string myid = unique_id();
 	set<string> computers                         = get_different_computers(); remove_id(computers, unique_id()); remove_id(computers, get_last_id());
 	map<string, map<string, string> > md5_remotes = load_md5s(path, computers); // file, idcomputer, md5 
+
+	fastrm(path);
 
 	run_end_script(path);
 
@@ -975,6 +1003,7 @@ void load_config(){
 	options["noretry"] = "false";
 	options["noclean"] = "true";
 	options["fastkeep"] = "true";
+	options["fastrm"] = "true";
 	//if(!exist_local_file("spdata/config")) return;
 	//FILE *file = fopen ( "spdata/config", "r" );
 	//char line [ SIZE_STR ]; [> or other suitable maximum line size <]
