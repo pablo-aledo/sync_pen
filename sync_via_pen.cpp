@@ -492,27 +492,6 @@ map<string,string> compute_md5(string dir){
 
 }
 
-void clean(string path){
-
-	if(options["dry_run"] == "true") return;
-
-	system("rm -f spdata/keep");
-
-
-	for ( unsigned int i = 0; i < 10; i++) {
-		system(("find .\"" + path + "\" -type d -empty -delete 2>/dev/null").c_str());
-	}
-
-	if(options["noclean"] == "true") return;
-
-	for ( unsigned int i = 0; i < 10; i++) {
-		system(("find  \"" + path + "\" -type d -empty -delete 2>/dev/null").c_str());
-	}
-
-	system(("mkdir -p  \"" + path + "\"").c_str());
-	system(("mkdir -p .\"" + path + "\"").c_str());
-}
-
 set<string> get_filenames(map<string, string> map1, map<string, string> map2){
 
 	set<string> ret;
@@ -715,6 +694,67 @@ bool find_one_different_of(map<string, string> md5s, set<string> computers, stri
 	}
 	
 	return false;
+}
+
+void clean(string path){
+
+	if(options["dry_run"] == "true") return;
+
+	system("rm -f spdata/keep");
+
+	if(options["noclean"] == "true") return;
+
+	set<string> computers                  = get_different_computers();
+	map<string, map<string, string> > md5s = load_md5s(path, computers); // file, idcomputer, md5 
+
+	FILE *fp;
+	stringstream command;
+	char ret[SIZE_STR];
+	
+	command << "find " << ".\"" + path + "\" -type f";
+	
+	fp = popen(command.str().c_str(), "r");
+	
+	while (fgets(ret,SIZE_STR, fp) != NULL){
+		trim(ret);
+		string ret_s = string(ret);
+		string filename = ret_s.substr(1);
+		if( !find_one_different_of( md5s[filename],computers, md5s[filename][unique_id()]) ){
+			rmfile("." + filename);
+		}
+
+	}
+	
+	pclose(fp);
+	
+	for ( unsigned int i = 0; i < 10; i++) {
+		system(("find .\"" + path + "\" -type d -empty -delete 2>/dev/null").c_str());
+	}
+
+	command.str("");
+	command << "find " << "\"" + path + "\" -mindepth 1 -type d -empty";
+	
+	fp = popen(command.str().c_str(), "r");
+	
+	while (fgets(ret,SIZE_STR, fp) != NULL){
+		trim(ret);
+		string folder = string(ret);
+		bool is_in_compress = false;
+		for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
+			if(is_in_path(folder, *it)){
+				is_in_compress = true;
+				break;
+			}
+		}
+		
+		if( !is_in_compress ){
+			system(("rmdir " + folder).c_str());
+		}
+
+	}
+	
+	pclose(fp);
+
 }
 
 string get_zenity_selection(){
@@ -932,7 +972,7 @@ void load_config(){
 	options["fast_md5"] = "true";
 	options["dry_run"] = "false";
 	options["noretry"] = "false";
-	options["noclean"] = "true";
+	options["noclean"] = "false";
 	options["fastkeep"] = "true";
 	//if(!exist_local_file("spdata/config")) return;
 	//FILE *file = fopen ( "spdata/config", "r" );
