@@ -184,7 +184,7 @@ bool is_in_keep(string filename){
 
 bool is_in_compress(string filename, string path){
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
-		string path_prefix = path + "/" + *it;
+		string path_prefix = path + "/" + *it + "/";
 		string filename_prefix = filename.substr(0, path_prefix.length());
 		//printf("%s\n", (path_prefix).c_str() );
 		//printf("%s\n", filename.substr(0, path_prefix.length()).c_str() );
@@ -251,8 +251,9 @@ void mvfile(string src, string dst){
 		}
 		return;
 	}
-	printf("\e[33m mv \e[0m %s\n", src.c_str());
-	fprintf(log_file, "\e[33m mv \e[0m %s\n", src.c_str());
+	string mvstr = (exist_local_file(dst))?"MV":"mv";
+	printf("\e[33m %s \e[0m %s\n", mvstr.c_str(), src.c_str());
+	fprintf(log_file, "\e[33m %s \e[0m %s\n", mvstr.c_str(), src.c_str());
 	if(options["dry_run"] == "true") return;
 	string dir_name = dirname(dst); mkfolder(dir_name);
 
@@ -972,7 +973,7 @@ void load_config(){
 	options["fast_md5"] = "true";
 	options["dry_run"] = "false";
 	options["noretry"] = "false";
-	options["noclean"] = "false";
+	options["noclean"] = "true";
 	options["fastkeep"] = "true";
 	//if(!exist_local_file("spdata/config")) return;
 	//FILE *file = fopen ( "spdata/config", "r" );
@@ -1044,6 +1045,7 @@ void check_log(){
 
 		if(line_s.substr(0,13) != "\e[32m cp \e[0m" && 
 		   line_s.substr(0,13) != "\e[33m mv \e[0m" &&
+		   line_s.substr(0,13) != "\e[33m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[31m rm \e[0m" ){
 			printf("\e[33m Incorrect log file \e[0m\n");
 			exit(-1);
