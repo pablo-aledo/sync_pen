@@ -230,8 +230,9 @@ void cpfile(string src, string dst){
 		}
 		return;
 	}
-	printf("\e[32m cp \e[0m %s\n", src.c_str());
-	fprintf(log_file, "\e[32m cp \e[0m %s\n", src.c_str());
+	string cpstr = (exist_local_file(dst))?"CP":"cp";
+	printf("\e[32m %s \e[0m %s\n", cpstr.c_str(), src.c_str());
+	fprintf(log_file, "\e[32m %s \e[0m %s\n", cpstr.c_str(), src.c_str());
 	if(options["dry_run"] == "true") return;
 	string dir_name = dirname(dst); mkfolder(dir_name);
 	system(("sudo rsync -a \"" + src + "\" \"" + dst + "\" 2>/dev/null").c_str());
@@ -1065,6 +1066,7 @@ void check_log(){
 		string line_s = string(line);
 
 		if(line_s.substr(0,13) != "\e[32m cp \e[0m" && 
+		   line_s.substr(0,13) != "\e[33m CP \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m mv \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[31m rm \e[0m" ){
