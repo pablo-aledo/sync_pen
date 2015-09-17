@@ -1066,7 +1066,7 @@ void check_log(){
 		string line_s = string(line);
 
 		if(line_s.substr(0,13) != "\e[32m cp \e[0m" && 
-		   line_s.substr(0,13) != "\e[33m CP \e[0m" &&
+		   line_s.substr(0,13) != "\e[32m CP \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m mv \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[31m rm \e[0m" ){
