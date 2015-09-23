@@ -604,7 +604,12 @@ void retry(map<string,string>& retries, string path){
 			cpfile(filename, "." + filename);
 			if(!exist_local_file("." + filename))
 				retries_at_end[filename] = myid;
+
+			continue;
 		}
+
+		retries_at_end[filename] = retries[filename];
+
 	}
 
 	retries = retries_at_end;
@@ -955,6 +960,7 @@ void end_working(string path){
 
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, local_md5);
 
+		if( is_in_retries(filename, retries) )                                                         { continue; }
 		if( is_in_compress(filename,path) )                                                            { continue; }
 		if( still_other_different && modified_after_epoch(filename, epoch_last_end))                   { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( !exist_remote && modified_after_epoch(filename, epoch_last_end))                           { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
@@ -994,7 +1000,7 @@ void load_config(){
 	options["fast_md5"] = "true";
 	options["dry_run"] = "false";
 	options["noretry"] = "false";
-	options["noclean"] = "true";
+	options["noclean"] = "false";
 	options["fastkeep"] = "true";
 	options["fastrm"] = "true";
 	//if(!exist_local_file("spdata/config")) return;
