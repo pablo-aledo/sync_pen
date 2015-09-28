@@ -547,7 +547,7 @@ void set_my_md5_last(string path){
 
 	file = fopen("spdata/latest", "w");
 	for( map<string,string>::iterator it = path_to_lastid.begin(); it != path_to_lastid.end(); it++ ){
-		fprintf(file, "%s %s", it->first.c_str(), it->second.c_str());
+		fprintf(file, "%s %s\n", it->first.c_str(), it->second.c_str());
 	}
 	fclose(file);
 
