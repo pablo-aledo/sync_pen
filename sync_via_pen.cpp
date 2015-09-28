@@ -1151,6 +1151,15 @@ void do_removecompressed(string path){
 	}
 }
 
+void move_to_retry(){
+	stringstream command;
+	command << "cat " << "./spdata/move_to_retry" << " ";
+	command << "| sed 's/$/" << " " << unique_id() << "/g' ";
+	command << ">> ./spdata/retries";
+	command << " && rm -f ./spdata/move_to_retry";
+	system(command.str().c_str());
+}
+
 int main(int argc, const char *argv[]){
 
 	check_log();
@@ -1158,6 +1167,7 @@ int main(int argc, const char *argv[]){
 	load_config();
 	load_ignores();
 	load_keep();
+	move_to_retry();
 	load_compress();
 
 	string selection;
