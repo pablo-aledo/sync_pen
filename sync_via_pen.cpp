@@ -309,7 +309,7 @@ string unique_id(){
 	stringstream command;
 	char ret[SIZE_STR];
 	
-	command << "( ifconfig eth0; ifconfig wlan0 ) | grep HWaddr | awk '{print $5}' | sed 's/://g'";
+	command << "( ifconfig eth0; ifconfig wlan0 ) 2>/dev/null | grep HWaddr | awk '{print $5}' | sed 's/://g'";
 
 	
 	fp = popen(command.str().c_str(), "r");
