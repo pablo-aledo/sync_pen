@@ -508,19 +508,47 @@ set<string> get_filenames(map<string, string> map1, map<string, string> map2){
 	return ret;
 }
 
-string get_last_id(){
+string get_last_id(string path){
 
-	char ret_p[SIZE_STR];
-	FILE* file = fopen("spdata/latest", "r");
-	fscanf(file, "%s", ret_p);
-	fclose(file);
-	return string(ret_p);
+	FILE *file = fopen ( "spdata/latest", "r" );
+	char line [ SIZE_STR ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		string line_s = string(line);
+		string path_line = line_s.substr(0, line_s.find_last_of(" "));
+		string id = line_s.substr(line_s.find_last_of(" ")+1);
+		if(path_line == path ) return id;
+	}
+	fclose ( file );
+	return "";
+
 }
 
-void set_my_md5_last(){
+void set_my_md5_last(string path){
+
 	if(options["dry_run"] == "true") return;
-	FILE* file = fopen("spdata/latest", "w");
-	fprintf(file, "%s", unique_id().c_str());
+
+	map<string, string> path_to_lastid;
+	FILE *file = fopen ( "spdata/latest", "r" );
+	char line [ SIZE_STR ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		string line_s = string(line);
+		string path_line = line_s.substr(0, line_s.find_last_of(" "));
+		string id = line_s.substr(line_s.find_last_of(" ")+1);
+		path_to_lastid[path_line] = id;
+	}
+	fclose ( file );
+
+	path_to_lastid[path] = unique_id();
+
+
+	file = fopen("spdata/latest", "w");
+	for( map<string,string>::iterator it = path_to_lastid.begin(); it != path_to_lastid.end(); it++ ){
+		fprintf(file, "%s %s", it->first.c_str(), it->second.c_str());
+	}
 	fclose(file);
 
 }
@@ -633,7 +661,7 @@ map<string, map<string, string> > load_md5s(string path, set<string> computers){
 }
 
 map<string, string> load_md5_latest(string path){
-	return load_md5( "./spdata/md5_remote_" + crc(path) + "_" + get_last_id());
+	return load_md5( "./spdata/md5_remote_" + crc(path) + "_" + get_last_id(path));
 }
 
 set<string> get_different_computers(){
@@ -808,9 +836,9 @@ void start_working(string path){
 	map<string, string> md5_local                 = compute_md5(path);
 	map<string, string> md5_remote_latest         = load_md5_latest(path); // file, md5
 	set<string> filenames                         = get_filenames(md5_local, md5_remote_latest);
-	set<string> computers                         = get_different_computers(); remove_id(computers, unique_id()); remove_id(computers, get_last_id());
+	set<string> computers                         = get_different_computers(); remove_id(computers, unique_id()); remove_id(computers, get_last_id(path));
 	map<string, map<string, string> > md5_remotes = load_md5s(path, computers); // file, idcomputer, md5
-	string lastid                                 = get_last_id();
+	string lastid                                 = get_last_id(path);
 	string myid = unique_id();
 	map<string, string> retries = load_retries(); // file, id
 
@@ -937,11 +965,11 @@ void end_working(string path){
 
 	map<string, string> retries = load_retries();
 	map<string, string> md5_local = compute_md5(path);
-	map<string, string> md5_remote = load_md5("spdata/md5_remote_" + crc(path) + "_" + get_last_id());
+	map<string, string> md5_remote = load_md5("spdata/md5_remote_" + crc(path) + "_" + get_last_id(path));
 	unsigned long epoch_last_end = get_epoch_last_end(path);
 	map<string, string> empty;
 	string myid = unique_id();
-	set<string> computers                         = get_different_computers(); remove_id(computers, unique_id()); remove_id(computers, get_last_id());
+	set<string> computers                         = get_different_computers(); remove_id(computers, unique_id()); remove_id(computers, get_last_id(path));
 	map<string, map<string, string> > md5_remotes = load_md5s(path, computers); // file, idcomputer, md5 
 
 	fastrm(path);
@@ -1228,9 +1256,10 @@ int main(int argc, const char *argv[]){
 			retry(retries, path);
 			save_retries(retries);
 		}
+
+		set_my_md5_last(path);
 	}
 
-	set_my_md5_last();
 	end_logging();
 
 	if(notify_end){
