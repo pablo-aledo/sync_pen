@@ -1,0 +1,6 @@
+.*\.view.*
+.*\/jdownloader2\/jdownloader\/.*
+.*\.Trash.*
+.*release_bak.*
+.*part$
+.*crdownload$
