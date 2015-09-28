@@ -779,7 +779,8 @@ vector<string> get_paths_from_file(){
 	
 	while ( fgets ( line, sizeof(line), file ) != NULL ){
 		trim(line);
-		ret.push_back(line);
+		if(line[0] != '#')
+			ret.push_back(line);
 	}
 	fclose ( file );
 
