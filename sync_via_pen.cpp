@@ -1153,7 +1153,7 @@ void do_removecompressed(string path){
 
 void move_to_retry(){
 	stringstream command;
-	command << "cat " << "./spdata/move_to_retry" << " ";
+	command << "cat " << "./spdata/move_to_retry" << " 2>/dev/null ";
 	command << "| sed 's/$/" << " " << unique_id() << "/g' ";
 	command << ">> ./spdata/retries";
 	command << " && rm -f ./spdata/move_to_retry";
