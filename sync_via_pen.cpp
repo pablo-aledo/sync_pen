@@ -1231,6 +1231,14 @@ int main(int argc, const char *argv[]){
 
 	}
 
+	if(selection == "reset"){
+		rmfile("./spdata/retries");
+		rmfile("./spdata/keep");
+		rmfile("./spdata/move_to_retry");
+		exit(0);
+	}
+
+
 	for( vector<string>::iterator it = paths.begin(); it != paths.end(); it++ ){
 		string path=*it;
 
