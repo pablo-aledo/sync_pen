@@ -1151,10 +1151,10 @@ void do_compress(string path){
 		}
 		string compress_prefix = *it;
 		stringstream command;
-		string filename = "spcompress_" + compress_prefix + ".tar.gz";
+		string filename = "spcompress_" + compress_prefix + ".tar.bz2";
 		myReplace(filename, "/", "_");
 		command << "cd " << path << ";";
-		command << "tar -czf " << filename << " " << compress_prefix << ";";
+		command << "tar -cjf " << filename << " " << compress_prefix << ";";
 		system(command.str().c_str());
 	}
 }
@@ -1164,12 +1164,12 @@ void do_uncompress(string path){
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
 		string compress_prefix = *it;
 		stringstream command;
-		string filename = "spcompress_" + compress_prefix + ".tar.gz";
+		string filename = "spcompress_" + compress_prefix + ".tar.bz2";
 		myReplace(filename, "/", "_");
 		command << "cd " << path << ";";
 		command << "[ -e " << filename << " ] && ";
 		command << "rm -rf " << compress_prefix << " && ";
-		command << "tar -xzf " << filename << " && ";
+		command << "tar -xjf " << filename << " && ";
 		command << "rm " << filename;
 		system(command.str().c_str());
 	}
