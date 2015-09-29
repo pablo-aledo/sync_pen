@@ -742,7 +742,7 @@ void clean(string path){
 	//system("rm -f spdata/keep");
 	string path_escaped = path;
 	escape_slash(path_escaped);
-	system(("sed -i '/^" + path_escaped + "/d' spdata/keep").c_str());
+	system(("sed -i '/^" + path_escaped + "/d' spdata/keep 2>/dev/null").c_str());
 
 	if(options["noclean"] == "true") return;
 
