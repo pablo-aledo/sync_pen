@@ -1179,7 +1179,7 @@ void do_removecompressed(string path){
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
 		string compress_prefix = *it;
 		stringstream command;
-		string filename = "spcompress_" + compress_prefix + ".tar.gz";
+		string filename = "spcompress_" + compress_prefix + ".tar.bz2";
 		myReplace(filename, "/", "_");
 		command << "cd " << path << ";";
 		command << "rm -f " << filename;
