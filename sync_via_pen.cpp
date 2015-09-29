@@ -115,6 +115,10 @@ void escape(string& filename){
 	myReplace(filename, "$", "\\$");
 }
 
+void escape_slash(string& filename){
+	myReplace(filename, "/", "\\/");
+}
+
 void descape(string& filename){
 	myReplace(filename, "$", "\\$");
 }
@@ -735,7 +739,10 @@ void clean(string path){
 
 	if(options["dry_run"] == "true") return;
 
-	system("rm -f spdata/keep");
+	//system("rm -f spdata/keep");
+	string path_escaped = path;
+	escape_slash(path_escaped);
+	system(("sed -i '/^" + path_escaped + "/d' spdata/keep").c_str());
 
 	if(options["noclean"] == "true") return;
 
@@ -1190,6 +1197,11 @@ void move_to_retry(){
 }
 
 int main(int argc, const char *argv[]){
+
+	//string escaped = "/media/disk";
+	//escape_slash(escaped);
+	//printf("escapeslash %s\n", escaped.c_str());
+	//exit(0);
 
 	check_log();
 	start_logging();
