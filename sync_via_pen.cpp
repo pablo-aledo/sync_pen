@@ -840,6 +840,40 @@ void run_end_script(string path){
 	system(("bash spdata/end_script.sh \"" + path + "\"").c_str());
 }
 
+
+
+set<string> load_move_to_retry(){
+
+	set<string> ret;
+	FILE *file = fopen ( "spdata/move_to_retry", "r" );
+	char line [ 1024 ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		ret.insert(string(line));
+	}
+	fclose ( file );
+
+	return ret;
+}
+
+bool is_in_movetoretry(string filename){
+
+	static bool movetoretry_loaded;
+	static set<string> move_to_retry_list;
+	if(!movetoretry_loaded){
+		move_to_retry_list = load_move_to_retry();
+		movetoretry_loaded = true;
+	}
+
+	return move_to_retry_list.find(filename) != move_to_retry_list.end();
+
+}
+
+void add_to_retry(string filename, map<string, string>& retries ){
+	retries[filename] = unique_id();
+}
+
 void start_working(string path){
 
 	map<string, string> md5_local                 = compute_md5(path);
@@ -865,6 +899,7 @@ void start_working(string path){
 
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
 		if( is_in_compress(filename,path) )                                                                                       { continue; }
+		if( is_in_movetoretry(filename) )                                                                                         { add_to_retry(filename, retries); continue; }
 		if( exist_copy && remote_md5 == local_md5 && !still_other_different && myid != lastid)                                    { rmfile("." + filename); continue; }
 		if( exist_remote && exist_local && remote_md5 == local_md5 )                                                              { continue; }
 		if( !exist_remote && exist_local )                                                                                        { rmfile(filename); continue; }
@@ -1210,7 +1245,6 @@ int main(int argc, const char *argv[]){
 	load_config();
 	load_ignores();
 	load_keep();
-	move_to_retry();
 	load_compress();
 
 	string selection;
@@ -1238,6 +1272,10 @@ int main(int argc, const char *argv[]){
 		rmfile("./spdata/keep");
 		rmfile("./spdata/move_to_retry");
 		exit(0);
+	}
+
+	if(selection=="end_working"){
+		move_to_retry();
 	}
 
 
@@ -1283,6 +1321,10 @@ int main(int argc, const char *argv[]){
 	}
 
 	end_logging();
+
+	if(selection=="start_working"){
+		system("rm -f spdata/move_to_retry");
+	}
 
 	if(notify_end){
 		system("zenity --notification --text 'sync_via_pen finished'");
