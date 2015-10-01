@@ -845,6 +845,8 @@ void run_end_script(string path){
 set<string> load_move_to_retry(){
 
 	set<string> ret;
+	if(!exist_local_file("spdata/move_to_retry")) return ret;
+
 	FILE *file = fopen ( "spdata/move_to_retry", "r" );
 	char line [ 1024 ]; /* or other suitable maximum line size */
 	
