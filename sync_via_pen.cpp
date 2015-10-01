@@ -1274,11 +1274,6 @@ int main(int argc, const char *argv[]){
 		exit(0);
 	}
 
-	if(selection=="end_working"){
-		move_to_retry();
-	}
-
-
 	for( vector<string>::iterator it = paths.begin(); it != paths.end(); it++ ){
 		string path=*it;
 
@@ -1294,9 +1289,11 @@ int main(int argc, const char *argv[]){
 			start_working(path);
 			do_uncompress(path);
 		} else if(selection == "end"){
+			move_to_retry();
 			do_compress(path);
 			end_working(path);
 			do_removecompressed(path);
+			system("rm -f spdata/move_to_retry");
 		} else if(selection == "drystart"){
 			options["dry_run"] = "true";
 			do_compress(path);
@@ -1321,10 +1318,6 @@ int main(int argc, const char *argv[]){
 	}
 
 	end_logging();
-
-	if(selection=="start_working"){
-		system("rm -f spdata/move_to_retry");
-	}
 
 	if(notify_end){
 		system("zenity --notification --text 'sync_via_pen finished'");
