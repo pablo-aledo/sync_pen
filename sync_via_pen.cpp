@@ -828,6 +828,8 @@ void clean(string path){
 	
 	pclose(fp);
 
+	system("find spdata -size 0 -not -name 'md5_remote_*' -delete");
+
 }
 
 string get_zenity_selection(){
