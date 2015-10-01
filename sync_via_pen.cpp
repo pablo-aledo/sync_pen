@@ -1190,11 +1190,43 @@ bool something_modified_after(string path, string prefix, string file){
 	
 }
 
+bool inlist(string compress, string path){
+
+	FILE *fp;
+	stringstream command;
+	char ret[SIZE_STR];
+
+	string compress_prefix = compress;
+	string filename = "spcompress_" + compress_prefix + ".tar.bz2";
+	myReplace(filename, "/", "_");
+
+
+	command << "cat spdata/md5_remote_" + crc(path) + "_" + unique_id() + " | grep " + filename;
+
+	fp = popen(command.str().c_str(), "r");
+
+	if(fgets(ret,SIZE_STR, fp) == NULL){
+		pclose(fp);
+		return false;
+	} else {
+		pclose(fp);
+		return true;
+	}
+
+			
+}
+
 void do_compress(string path){
 
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
 
-		if(!something_modified_after(path, *it, "spdata/md5_remote_" + crc(path)+ "_" + unique_id() )){
+
+		bool force_compress = false;
+		if( exist_local_file(path + "/" + (*it) ) && !inlist(*it, path) ){
+			force_compress = true;	
+		}
+
+		if(!force_compress && !something_modified_after(path, *it, "spdata/md5_remote_" + crc(path)+ "_" + unique_id() )){
 			continue;
 		}
 		string compress_prefix = *it;
