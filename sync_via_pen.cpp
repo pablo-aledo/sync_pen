@@ -309,6 +309,8 @@ string crc(string input){
 
 string unique_id(){
 
+	if(options["unique_id"] != "") return options["unique_id"];
+
 	FILE *fp;
 	stringstream command;
 	char ret[SIZE_STR];
