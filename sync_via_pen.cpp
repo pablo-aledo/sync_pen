@@ -620,6 +620,38 @@ bool is_in_path(string filename, string path){
 	return filename.substr(0, path.length()) == path;
 }
 
+
+set<string> load_move_to_retry(){
+
+	set<string> ret;
+	if(!exist_local_file("spdata/move_to_retry")) return ret;
+
+	FILE *file = fopen ( "spdata/move_to_retry", "r" );
+	char line [ 1024 ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		ret.insert(string(line));
+	}
+	fclose ( file );
+
+	return ret;
+}
+
+bool is_in_movetoretry(string filename){
+
+	static bool movetoretry_loaded;
+	static set<string> move_to_retry_list;
+	if(!movetoretry_loaded){
+		move_to_retry_list = load_move_to_retry();
+		movetoretry_loaded = true;
+	}
+
+	return move_to_retry_list.find(filename) != move_to_retry_list.end();
+
+}
+
+
 void retry(map<string,string>& retries, string path){
 	map<string,string> retries_at_end;
 	if(options["noretry"] == "true") return;
@@ -633,6 +665,11 @@ void retry(map<string,string>& retries, string path){
 		if( !exist_local_file(filename) && it->second == myid){
 			continue;
 		}
+
+		if( is_in_movetoretry(filename) ) {
+			continue;
+		}
+
 
 		if( is_in_path(filename, path) && it->second == myid){
 			cpfile(filename, "." + filename);
@@ -841,36 +878,6 @@ void run_end_script(string path){
 }
 
 
-
-set<string> load_move_to_retry(){
-
-	set<string> ret;
-	if(!exist_local_file("spdata/move_to_retry")) return ret;
-
-	FILE *file = fopen ( "spdata/move_to_retry", "r" );
-	char line [ 1024 ]; /* or other suitable maximum line size */
-	
-	while ( fgets ( line, sizeof(line), file ) != NULL ){
-		trim(line);
-		ret.insert(string(line));
-	}
-	fclose ( file );
-
-	return ret;
-}
-
-bool is_in_movetoretry(string filename){
-
-	static bool movetoretry_loaded;
-	static set<string> move_to_retry_list;
-	if(!movetoretry_loaded){
-		move_to_retry_list = load_move_to_retry();
-		movetoretry_loaded = true;
-	}
-
-	return move_to_retry_list.find(filename) != move_to_retry_list.end();
-
-}
 
 void add_to_retry(string filename, map<string, string>& retries ){
 	retries[filename] = unique_id();
