@@ -559,11 +559,20 @@ void set_my_md5_last(string path){
 
 }
 
+void add_to_md5_if_not_exists(map<string, string>& map1, map<string, string> map2){
+
+	for( map<string,string>::iterator it = map2.begin(); it != map2.end(); it++ ){
+		if(map1[it->first] == "")
+			map1[it->first] = it->second;
+	}
+
+}
+
 void dump_md5(map<string, string> md5s, string path){
 
 	if(options["dry_run"] == "true") return;
 
-	add_to_md5(md5s, compress_md5s);
+	add_to_md5_if_not_exists(md5s, compress_md5s);
 
 	FILE* file = fopen(("spdata/md5_remote_" + crc(path) + "_" + unique_id()).c_str(), "w");
 	for( map<string,string>::iterator it = md5s.begin(); it != md5s.end(); it++ ){
