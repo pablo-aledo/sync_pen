@@ -876,6 +876,27 @@ bool is_in_retries(string filename, map<string, string> retries){
 	return retries.find(filename) != retries.end();
 }
 
+bool is_in_retries(string filename){
+
+	if(!exist_local_file("spdata/retries")) return false;
+	FILE *file = fopen ( "spdata/retries", "r" );
+	char line [ SIZE_STR ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		string line_s = string(line);
+		string file_in_ret = line_s.substr(0, line_s.find_last_of(" "));
+		if(file_in_ret == filename){
+			fclose(file);
+			return true;
+		}
+	}
+	fclose ( file );
+
+	return false;
+
+}
+
 void run_start_script(string path){
 	if(options["dry_run"] == "true") return;
 	if(!exist_local_file("spdata/start_script.sh")) return;
@@ -1229,19 +1250,24 @@ void do_compress(string path){
 
 	for( set<string>::iterator it = compress.begin(); it != compress.end(); it++ ){
 
+		string compress_prefix = *it;
+		stringstream command;
+		string filename = "spcompress_" + compress_prefix + ".tar.bz2";
+		myReplace(filename, "/", "_");
 
 		bool force_compress = false;
 		if( exist_local_file(path + "/" + (*it) ) && !inlist(*it, path) ){
 			force_compress = true;	
 		}
 
+		
+		if(is_in_retries(filename)){
+			force_compress = true;	
+		}
+
 		if(!force_compress && !something_modified_after(path, *it, "spdata/md5_remote_" + crc(path)+ "_" + unique_id() )){
 			continue;
 		}
-		string compress_prefix = *it;
-		stringstream command;
-		string filename = "spcompress_" + compress_prefix + ".tar.bz2";
-		myReplace(filename, "/", "_");
 		command << "cd " << path << ";";
 		command << "tar -cjf " << filename << " " << compress_prefix << ";";
 		system(command.str().c_str());
