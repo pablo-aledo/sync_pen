@@ -1311,6 +1311,13 @@ void move_to_retry(){
 	system(command.str().c_str());
 }
 
+void show_retries(){
+	if(options["show_retries"] == "false") return;
+	if(!exist_local_file("spdata/retries")) return;
+	printf("\e[31m Retries \e[0m\n");
+	system("cat spdata/retries");
+}
+
 int main(int argc, const char *argv[]){
 
 	//string escaped = "/media/disk";
@@ -1396,6 +1403,7 @@ int main(int argc, const char *argv[]){
 	}
 
 	end_logging();
+	show_retries();
 
 	if(notify_end){
 		system("zenity --notification --text 'sync_via_pen finished'");
