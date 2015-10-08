@@ -1256,14 +1256,18 @@ void do_compress(string path){
 		myReplace(filename, "/", "_");
 
 		bool force_compress = false;
-		if( exist_local_file(path + "/" + (*it) ) && !inlist(*it, path) ){
+		if( exist_local_file(path + "/" + (*it) ) && !inlist(*it, path) )
 			force_compress = true;	
-		}
 
-		
-		if(is_in_retries(filename)){
+		if(is_in_retries(filename))
 			force_compress = true;	
-		}
+
+		set<string> computers                         = get_different_computers();
+		map<string, map<string, string> > md5_remotes = load_md5s(path, computers); // file, idcomputer, md5_remotes
+		string remote_md5 = md5_remotes[filename][*(computers.begin())];
+		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, remote_md5 );
+		if(still_other_different)
+			force_compress = true;
 
 		if(!force_compress && !something_modified_after(path, *it, "spdata/md5_remote_" + crc(path)+ "_" + unique_id() )){
 			continue;
