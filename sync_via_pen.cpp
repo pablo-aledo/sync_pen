@@ -1259,7 +1259,7 @@ void do_compress(string path){
 		if( exist_local_file(path + "/" + (*it) ) && !inlist(*it, path) )
 			force_compress = true;	
 
-		if(is_in_retries(filename))
+		if(is_in_retries( path + "/" + filename))
 			force_compress = true;	
 
 		set<string> computers                         = get_different_computers();
