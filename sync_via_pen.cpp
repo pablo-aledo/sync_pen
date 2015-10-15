@@ -671,13 +671,13 @@ void retry(map<string,string>& retries, string path){
 	string myid = unique_id();
 	for( map<string,string>::iterator it = retries.begin(); it != retries.end(); it++ ){
 		string filename = it->first;
-		if( !exist_local_file(filename) && it->second == myid){
-			continue;
-		}
+		//if( !exist_local_file(filename) && it->second == myid){
+		//	continue;
+		//}
 
-		if( is_in_movetoretry(filename) ) {
-			continue;
-		}
+		//if( is_in_movetoretry(filename) ) {
+		//	continue;
+		//}
 
 
 		if( is_in_path(filename, path) && it->second == myid){
