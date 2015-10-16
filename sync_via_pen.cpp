@@ -1053,7 +1053,7 @@ string ltos(unsigned long i){
 }
 
 void set_time(string file, unsigned long time){
-	system(("touch " + file + " --date=@" + ltos(time)).c_str());
+	system(("touch -d '@" + ltos(time) + "' " + file).c_str());
 }
 
 
