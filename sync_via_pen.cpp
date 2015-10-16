@@ -1046,8 +1046,20 @@ void fastrm(string path){
 
 }
 
+string ltos(unsigned long i){
+	stringstream i_ss;
+	i_ss << i;
+	return i_ss.str();
+}
+
+void set_time(string file, unsigned long time){
+	system(("touch " + file + " --date=@" + ltos(time)).c_str());
+}
+
+
 void end_working(string path){
 
+	unsigned long start_time = time(NULL);
 	map<string, string> retries = load_retries();
 	map<string, string> md5_local = compute_md5(path);
 	map<string, string> md5_remote = load_md5("spdata/md5_remote_" + crc(path) + "_" + get_last_id(path));
@@ -1088,8 +1100,8 @@ void end_working(string path){
 
 	save_retries(retries);
 	dump_md5(md5_local, path);
+	set_time( "spdata/md5_remote_" + crc(path) + "_" + get_last_id(path), start_time);
 	clean(path);
-
 }
 
 void setup(string path){
