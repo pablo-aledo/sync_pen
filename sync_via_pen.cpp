@@ -974,7 +974,7 @@ unsigned long get_epoch_last_end(string path){
 	stringstream command;
 	char ret[SIZE_STR];
 	
-	command << "stat --format=%Z spdata/md5_remote_" + crc(path) + "_" + unique_id();
+	command << "stat --format=%Y spdata/md5_remote_" + crc(path) + "_" + unique_id();
 	
 	fp = popen(command.str().c_str(), "r");
 	
