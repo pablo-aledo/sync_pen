@@ -1335,6 +1335,29 @@ void show_retries(){
 	system("cat spdata/retries");
 }
 
+set<string> exclude_once;
+
+void load_exclude_once(){
+	if(!exist_local_file("spdata/exclude_once")) return;
+	FILE *file = fopen ( "spdata/exclude_once", "r" );
+	char line [ 128 ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		exclude_once.insert(line);
+	}
+	fclose ( file );
+	
+}
+
+void rm_exclude_once(){
+	system("rm -f spdata/exclude_once");
+}
+
+bool is_in_exclude_once(string path){
+	return exclude_once.find(path) != exclude_once.end();
+}
+
 int main(int argc, const char *argv[]){
 
 	//string escaped = "/media/disk";
@@ -1348,6 +1371,7 @@ int main(int argc, const char *argv[]){
 	load_ignores();
 	load_keep();
 	load_compress();
+	load_exclude_once();
 
 	string selection;
 	vector<string> paths;
@@ -1378,6 +1402,8 @@ int main(int argc, const char *argv[]){
 
 	for( vector<string>::iterator it = paths.begin(); it != paths.end(); it++ ){
 		string path=*it;
+
+		if(is_in_exclude_once(path)) continue;
 
 		if(exist_local_file(*it)){
 			printf("Path \e[34m%s\e[0m\n", path.c_str());
@@ -1418,6 +1444,8 @@ int main(int argc, const char *argv[]){
 
 		set_my_md5_last(path);
 	}
+
+	rm_exclude_once();
 
 	end_logging();
 	show_retries();
