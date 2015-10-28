@@ -1053,6 +1053,7 @@ string ltos(unsigned long i){
 }
 
 void set_time(string file, unsigned long time){
+	if(!exist_local_file(file)) return;
 	system(("touch -d '@" + ltos(time) + "' " + file).c_str());
 }
 
