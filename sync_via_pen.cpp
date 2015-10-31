@@ -235,7 +235,8 @@ void cpfile(string src, string dst){
 		return;
 	}
 	string cpstr = (exist_local_file(dst))?"CP":"cp";
-	printf("\e[32m %s \e[0m %s\n", cpstr.c_str(), src.c_str());
+	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 32;
+	printf("\e[%dm %s \e[0m %s\n",color,cpstr.c_str(), src.c_str());
 	fprintf(log_file, "\e[32m %s \e[0m %s\n", cpstr.c_str(), src.c_str());
 	if(options["dry_run"] == "true") return;
 	string dir_name = dirname(dst); mkfolder(dir_name);
@@ -257,7 +258,8 @@ void mvfile(string src, string dst){
 		return;
 	}
 	string mvstr = (exist_local_file(dst))?"MV":"mv";
-	printf("\e[33m %s \e[0m %s\n", mvstr.c_str(), src.c_str());
+	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 33;
+	printf("\e[%dm %s \e[0m %s\n",color, mvstr.c_str(), src.c_str());
 	fprintf(log_file, "\e[33m %s \e[0m %s\n", mvstr.c_str(), src.c_str());
 	if(options["dry_run"] == "true") return;
 	string dir_name = dirname(dst); mkfolder(dir_name);
@@ -1340,7 +1342,7 @@ set<string> exclude_once;
 void load_exclude_once(){
 	if(!exist_local_file("spdata/exclude_once")) return;
 	FILE *file = fopen ( "spdata/exclude_once", "r" );
-	char line [ 128 ]; /* or other suitable maximum line size */
+	char line [ 1024 ]; /* or other suitable maximum line size */
 	
 	while ( fgets ( line, sizeof(line), file ) != NULL ){
 		trim(line);
@@ -1351,6 +1353,7 @@ void load_exclude_once(){
 }
 
 void rm_exclude_once(){
+	if(options["dry_run"] == "true") return;
 	system("rm -f spdata/exclude_once");
 }
 
