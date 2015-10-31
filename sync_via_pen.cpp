@@ -120,7 +120,7 @@ void escape_slash(string& filename){
 }
 
 void descape(string& filename){
-	myReplace(filename, "$", "\\$");
+	myReplace(filename, "\\$", "$");
 }
 
 string dirname(string file){
@@ -811,6 +811,7 @@ void clean(string path){
 		trim(ret);
 		string ret_s = string(ret);
 		string filename = ret_s.substr(1);
+		escape(filename);
 		if( !find_one_different_of( md5s[filename],computers, md5s[filename][unique_id()]) ){
 			rmfile("." + filename);
 		}
