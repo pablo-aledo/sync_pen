@@ -236,8 +236,9 @@ void cpfile(string src, string dst){
 	}
 	string cpstr = (exist_local_file(dst))?"CP":"cp";
 	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 32;
+	if(src.find("spcompress") != string::npos && src[0] == '.' ) color=31;
 	printf("\e[%dm %s \e[0m %s\n",color,cpstr.c_str(), src.c_str());
-	fprintf(log_file, "\e[32m %s \e[0m %s\n", cpstr.c_str(), src.c_str());
+	fprintf(log_file, "\e[%dm %s \e[0m %s\n", color, cpstr.c_str(), src.c_str());
 	if(options["dry_run"] == "true") return;
 	string dir_name = dirname(dst); mkfolder(dir_name);
 	system(("sudo rsync -a \"" + src + "\" \"" + dst + "\" 2>/dev/null").c_str());
@@ -259,8 +260,9 @@ void mvfile(string src, string dst){
 	}
 	string mvstr = (exist_local_file(dst))?"MV":"mv";
 	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 33;
+	if(src.find("spcompress") != string::npos && src[0] == '.') color=31;
 	printf("\e[%dm %s \e[0m %s\n",color, mvstr.c_str(), src.c_str());
-	fprintf(log_file, "\e[33m %s \e[0m %s\n", mvstr.c_str(), src.c_str());
+	fprintf(log_file, "\e[%dm %s \e[0m %s\n", color, mvstr.c_str(), src.c_str());
 	if(options["dry_run"] == "true") return;
 	string dir_name = dirname(dst); mkfolder(dir_name);
 
@@ -1133,6 +1135,7 @@ void load_config(){
 	options["noclean"] = "false";
 	options["fastkeep"] = "true";
 	options["fastrm"] = "true";
+	options["colors"] = "gr";
 	//if(!exist_local_file("spdata/config")) return;
 	//FILE *file = fopen ( "spdata/config", "r" );
 	//char line [ SIZE_STR ]; [> or other suitable maximum line size <]
@@ -1203,10 +1206,14 @@ void check_log(){
 
 		if(line_s.substr(0,13) != "\e[32m cp \e[0m" && 
 		   line_s.substr(0,13) != "\e[32m CP \e[0m" &&
+		   line_s.substr(0,13) != "\e[31m cp \e[0m" &&
+		   line_s.substr(0,13) != "\e[31m CP \e[0m" &&
+		   line_s.substr(0,13) != "\e[32m mv \e[0m" &&
+		   line_s.substr(0,13) != "\e[32m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m mv \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[31m rm \e[0m" ){
-			printf("\e[33m Incorrect log file \e[0m\n");
+			printf("\e[33m Incorrect log file\e[0m %s\n", line);
 			exit(-1);
 		}
 	}
