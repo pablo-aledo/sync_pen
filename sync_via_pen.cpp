@@ -1099,6 +1099,7 @@ void end_working(string path){
 		if( is_in_retries(filename, retries) )                                                         { continue; }
 		if( is_in_compress(filename,path) )                                                            { continue; }
 		if( still_other_different && modified_after_epoch(filename, epoch_last_end))                   { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
+		if( still_other_different && !exist_copy )                                                     { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( !exist_remote && modified_after_epoch(filename, epoch_last_end))                           { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( exist_remote && local_md5 != remote_md5 && modified_after_epoch(filename, epoch_last_end)) { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 
