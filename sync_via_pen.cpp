@@ -818,6 +818,7 @@ void clean(string path){
 		string ret_s = string(ret);
 		string filename = ret_s.substr(1);
 		escape(filename);
+		tox_and_detox(filename);
 		if( !find_one_different_of( md5s[filename],computers, md5s[filename][unique_id()]) ){
 			rmfile("." + filename);
 		}
