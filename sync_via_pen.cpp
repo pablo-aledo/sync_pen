@@ -148,11 +148,15 @@ void mkfolder(string path){
 
 void tox_and_detox(string& filename){
 	if(filename[0] == '.'){
-		myReplace(filename, ":", "%colon%" );
-		myReplace(filename, "?", "%question%" );
+		string filename_s = filename.substr(1);
+		myReplace(filename_s, ":", "%colon%" );
+		myReplace(filename_s, "?", "%question%" );
+		myReplace(filename_s, "./", "%dot%/" );
+		filename = "." + filename_s;
 	} else {
 		myReplace(filename, "%colon%", ":" );
 		myReplace(filename, "%question%", "?" );
+		myReplace(filename, "%dot%/", "./" );
 	}
 }
 
@@ -1212,6 +1216,7 @@ void check_log(){
 		   line_s.substr(0,13) != "\e[32m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[31m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m mv \e[0m" &&
+		   line_s.substr(0,13) != "\e[31m mv \e[0m" &&
 		   line_s.substr(0,13) != "\e[33m MV \e[0m" &&
 		   line_s.substr(0,13) != "\e[31m rm \e[0m" ){
 			printf("\e[33m Incorrect log file\e[0m %s\n", line);
