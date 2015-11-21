@@ -146,6 +146,13 @@ void mkfolder(string path){
 	system(("mkdir -p \"" + path + "\"").c_str());
 }
 
+void detox(string& filename){
+	myReplace(filename, "%colon%", ":" );
+	myReplace(filename, "%question%", "?" );
+	myReplace(filename, "%dot%/", "./" );
+}
+
+
 void tox_and_detox(string& filename){
 	if(filename[0] == '.'){
 		string filename_s = filename.substr(1);
@@ -361,6 +368,8 @@ map<string,string> load_md5(string filename){
 }
 
 string md5_of_file(string filename){
+
+	tox_and_detox(filename);
 
 	stringstream command;
 	char line[SIZE_STR];
@@ -1178,7 +1187,9 @@ void load_keep(){
 	
 	while ( fgets ( line, sizeof(line), file ) != NULL ){
 		trim(line);
-		keep.insert(string(line));
+		string line_s = string(line);
+		detox(line_s);
+		keep.insert(line_s);
 		
 	}
 	fclose ( file );
