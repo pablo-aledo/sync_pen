@@ -552,6 +552,8 @@ void set_my_md5_last(string path){
 
 	if(options["dry_run"] == "true") return;
 
+	if(!exist_local_file("spdata/latest")) system("touch spdata/latest");
+
 	map<string, string> path_to_lastid;
 	FILE *file = fopen ( "spdata/latest", "r" );
 	char line [ SIZE_STR ]; /* or other suitable maximum line size */
@@ -1302,6 +1304,9 @@ void do_compress(string path){
 			force_compress = true;	
 
 		if(is_in_retries( path + "/" + filename))
+			force_compress = true;	
+
+		if(is_in_keep( path + "/" + filename))
 			force_compress = true;	
 
 		set<string> computers                         = get_different_computers();
