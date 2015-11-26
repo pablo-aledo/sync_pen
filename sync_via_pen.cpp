@@ -1393,12 +1393,54 @@ bool is_in_exclude_once(string path){
 	return exclude_once.find(path) != exclude_once.end();
 }
 
+string equiv(string file){
+	if(file[0] == '.') return file.substr(1);
+	else if(file[0] == '/') return "." + file;
+}
+
+string spcequiv(string file){
+	myReplace(file, "spcompress_", "");
+	myReplace(file, "_", "/");
+	myReplace(file, ".tar.bz2", "");
+	return file;
+}
+
+
 int main(int argc, const char *argv[]){
 
 	//string escaped = "/media/disk";
 	//escape_slash(escaped);
 	//printf("escapeslash %s\n", escaped.c_str());
 	//exit(0);
+	
+	
+	
+	if(string(argv[1]) == "meld"){
+		string file = string(argv[2]);
+		if(file.find("spcompress") == string::npos){
+			system(("meld " + file + " " + equiv(file)).c_str());
+		} else {
+
+			string route = file.substr(1, file.find_last_of("/"));
+			string filename = file.substr(file.find_last_of("/")+1);
+			string route2 = filename;
+			myReplace(route2,"spcompress_", "");
+			myReplace(route2,".tar.bz2", "");
+			myReplace(route2, "_","/");
+			//printf("%s %s %s\n", route.c_str(), filename.c_str(), route2.c_str());
+			stringstream command;
+			command << "PTH=$PWD;";
+			command << "mkdir /tmp/spcompress 2>/dev/null; rm -rf /tmp/spcompress/*;";
+			command << "cd /tmp/spcompress/; tar -xjf $PTH/" << "/" << file << ";";
+			command << "meld " << route2 << " " << route << "/" << route2 << ";";
+			system( command.str().c_str() );
+
+		}
+		exit(0);
+	}
+
+	
+	
 
 	check_log();
 	start_logging();
