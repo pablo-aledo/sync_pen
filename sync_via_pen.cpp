@@ -956,8 +956,17 @@ void start_working(string path){
 		bool   exist_local           = (local_md5 != "");
 		bool   exist_copy            = exist_local_file("." + filename);
 		bool   exist_remote          = (remote_md5 != "");
-
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, remote_md5 );
+
+		//if(filename.find("") != string::npos){
+			//printf("%s %d %d %d %d\n",
+					//filename.c_str(),
+					//exist_local,
+					//exist_copy,
+					//exist_remote,
+					//still_other_different
+			//);
+		//}
 
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
 		if( is_in_compress(filename,path) )                                                                                       { continue; }
@@ -1105,14 +1114,24 @@ void end_working(string path){
 		bool   exist_local  = (local_md5 != "");
 		bool   exist_copy   = exist_local_file("." + filename);
 		bool   exist_remote = (remote_md5 != "");
-
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, local_md5);
+
+		//if(filename.find("") != string::npos){
+			//printf("%s %d %d %d %d\n",
+					//filename.c_str(),
+					//exist_local,
+					//exist_copy,
+					//exist_remote,
+					//still_other_different
+			//);
+		//}
 
 		if( is_in_retries(filename, retries) )                                                         { continue; }
 		if( is_in_compress(filename,path) )                                                            { continue; }
 		if( still_other_different && modified_after_epoch(filename, epoch_last_end))                   { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( still_other_different && !exist_copy )                                                     { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( !exist_remote && modified_after_epoch(filename, epoch_last_end))                           { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
+		if( !exist_remote && !exist_copy )                                                             { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 		if( exist_remote && local_md5 != remote_md5 && modified_after_epoch(filename, epoch_last_end)) { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
 
 	}
