@@ -958,15 +958,15 @@ void start_working(string path){
 		bool   exist_remote          = (remote_md5 != "");
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, remote_md5 );
 
-		//if(filename.find("") != string::npos){
-			//printf("%s %d %d %d %d\n",
-					//filename.c_str(),
-					//exist_local,
-					//exist_copy,
-					//exist_remote,
-					//still_other_different
-			//);
-		//}
+		if(filename.find("spcompress") != string::npos){
+			printf("%s %d %d %d %d\n",
+					filename.c_str(),
+					exist_local,
+					exist_copy,
+					exist_remote,
+					still_other_different
+			);
+		}
 
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
 		if( is_in_compress(filename,path) )                                                                                       { continue; }
@@ -974,7 +974,7 @@ void start_working(string path){
 		if( exist_copy && remote_md5 == local_md5 && !still_other_different && myid != lastid)                                    { rmfile("." + filename); continue; }
 		if( exist_remote && exist_local && remote_md5 == local_md5 )                                                              { continue; }
 		if( !exist_remote && exist_local )                                                                                        { rmfile(filename); continue; }
-		if( exist_remote && !exist_local && !exist_copy )                                                                         { actualize_retries("." + filename, retries, lastid); continue; }
+		if( exist_remote && !exist_local && !exist_copy && filename.find("spcompress_") == string::npos)                          { actualize_retries("." + filename, retries, lastid); continue; }
 		if( exist_remote && exist_local  && local_md5 != remote_md5 && !exist_copy )                                              { actualize_retries("." + filename, retries, lastid); continue; }
 		if( exist_remote && !exist_local && exist_copy && !still_other_different && different_md5(filename, "." + filename) )     { actualize_retries("." + filename, retries, lastid); mvfile("." + filename, filename);continue; }
 		if( exist_remote && !exist_local && exist_copy && still_other_different && different_md5(filename, "." + filename))       { actualize_retries("." + filename, retries, lastid); cpfile("." + filename, filename);continue; }
