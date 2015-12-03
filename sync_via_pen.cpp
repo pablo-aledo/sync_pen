@@ -958,15 +958,15 @@ void start_working(string path){
 		bool   exist_remote          = (remote_md5 != "");
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, remote_md5 );
 
-		if(filename.find("spcompress") != string::npos){
-			printf("%s %d %d %d %d\n",
-					filename.c_str(),
-					exist_local,
-					exist_copy,
-					exist_remote,
-					still_other_different
-			);
-		}
+		//if(filename.find("") != string::npos){
+			//printf("%s %d %d %d %d\n",
+					//filename.c_str(),
+					//exist_local,
+					//exist_copy,
+					//exist_remote,
+					//still_other_different
+			//);
+		//}
 
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
 		if( is_in_compress(filename,path) )                                                                                       { continue; }
