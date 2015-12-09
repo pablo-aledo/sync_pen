@@ -696,9 +696,10 @@ void retry(map<string,string>& retries, string path){
 		//	continue;
 		//}
 
-		//if( is_in_movetoretry(filename) ) {
-		//	continue;
-		//}
+		if( is_in_movetoretry(filename) ) {
+			retries_at_end[filename] = myid;
+			continue;
+		}
 
 
 		if( is_in_path(filename, path) && it->second == myid){
