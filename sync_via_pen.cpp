@@ -155,11 +155,13 @@ void detox(string& filename){
 
 void tox_and_detox(string& filename){
 	if(filename[0] == '.'){
+		filename[0] = '-';
 		string filename_s = filename.substr(1);
 		myReplace(filename_s, ":", "%colon%" );
 		myReplace(filename_s, "?", "%question%" );
 		myReplace(filename_s, "./", "%dot%/" );
 		filename = "." + filename_s;
+		filename[0] = '.';
 	} else {
 		myReplace(filename, "%colon%", ":" );
 		myReplace(filename, "%question%", "?" );
