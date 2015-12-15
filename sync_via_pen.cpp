@@ -258,6 +258,17 @@ void cpfile(string src, string dst){
 	if(!enough_space()){
 		printf("No enough space\n");
 		system(("rm -f \"" + dst + "\"").c_str());
+
+		string route = dst.substr(0, dst.find_last_of("/"));
+		string filename = dst.substr(dst.find_last_of("/")+1);
+
+		string rmcommand = "rm -f \'" + route + "/." + filename + "." + "\'*";
+		//printf("rmcommand %s\n", rmcommand.c_str());
+		system(rmcommand.c_str());
+		//exit(0);
+
+
+
 	}
 }
 
