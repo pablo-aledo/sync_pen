@@ -1006,6 +1006,10 @@ string unid_from(string path){
 
 }
 
+void remove_empty_folders(string dir){
+	system(("find \"" + dir + "\" -empty -delete").c_str());
+}
+
 void start_working(string path){
 
 	map<string, string> md5_local                 = compute_md5(path);
@@ -1062,6 +1066,8 @@ void start_working(string path){
 	dump_md5(compute_md5(path), path);
 	if(!is_in_unidirectional(path))
 		clean(path);
+	if(is_in_unidirectional(path))
+		remove_empty_folders("." + path);
 }
 
 long stol(string str){
