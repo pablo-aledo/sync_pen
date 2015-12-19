@@ -950,6 +950,43 @@ void add_to_retry(string filename, map<string, string>& retries ){
 	retries[filename] = unique_id();
 }
 
+
+typedef struct Unidir {
+	string path;
+	string from;
+	string to;
+} Unidir;
+
+set<Unidir> unidirectionals;
+
+inline bool operator<(const Unidir& lhs, const Unidir& rhs) {
+	return lhs.path+lhs.from+lhs.to < rhs.path+rhs.from+rhs.to;
+}
+
+
+
+bool is_in_unidirectional(string path){
+	for( set<Unidir>::iterator it = unidirectionals.begin(); it != unidirectionals.end(); it++ ){
+		if(it->path == path) return true;
+	}
+
+	return false;
+}
+
+string unid_to(string path){
+	for( set<Unidir>::iterator it = unidirectionals.begin(); it != unidirectionals.end(); it++ ){
+		if(it->path == path) return it->to;
+	}
+
+}
+
+string unid_from(string path){
+	for( set<Unidir>::iterator it = unidirectionals.begin(); it != unidirectionals.end(); it++ ){
+		if(it->path == path) return it->from;
+	}
+
+}
+
 void start_working(string path){
 
 	map<string, string> md5_local                 = compute_md5(path);
@@ -981,7 +1018,8 @@ void start_working(string path){
 					//still_other_different
 			//);
 		//}
-
+		if( is_in_unidirectional(path) && myid == unid_to(path) && !exist_local && exist_copy )                                   { mvfile("." + filename, filename); continue; }
+		if( is_in_unidirectional(path) )                                                                                          { continue; }
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
 		if( is_in_compress(filename,path) )                                                                                       { continue; }
 		if( is_in_movetoretry(filename) )                                                                                         { add_to_retry(filename, retries); continue; }
@@ -1139,7 +1177,10 @@ void end_working(string path){
 					//still_other_different
 			//);
 		//}
-
+		
+		
+		if( is_in_unidirectional(path) && myid == unid_from(path) && exist_local && !exist_copy )      { mvfile(filename, "." + filename); continue; }
+		if( is_in_unidirectional(path) )                                                               { continue; }
 		if( is_in_retries(filename, retries) )                                                         { continue; }
 		if( is_in_compress(filename,path) )                                                            { continue; }
 		if( still_other_different && modified_after_epoch(filename, epoch_last_end))                   { cpfile(filename, "." + filename);actualize_retries("." + filename, retries, myid); continue; }
@@ -1439,6 +1480,27 @@ string spcequiv(string file){
 }
 
 
+
+void load_unidirectional(){
+
+	if(!exist_local_file("spdata/unidirectional")) return;
+	
+	FILE *file = fopen ( "spdata/unidirectional", "r" );
+	char line [ 128 ]; /* or other suitable maximum line size */
+	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		string line_s = string(line);
+		string path = tokenize(line_s, " ")[0];
+		string from = tokenize(line_s, " ")[1];
+		string to   = tokenize(line_s, " ")[2];
+		Unidir unidir; unidir.path=path; unidir.from=from; unidir.to=to;
+		unidirectionals.insert(unidir);
+	}
+
+	fclose ( file );
+}
+
 int main(int argc, const char *argv[]){
 
 	//string escaped = "/media/disk";
@@ -1482,6 +1544,7 @@ int main(int argc, const char *argv[]){
 	load_keep();
 	load_compress();
 	load_exclude_once();
+	load_unidirectional();
 
 	string selection;
 	vector<string> paths;
