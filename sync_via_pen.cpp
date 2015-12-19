@@ -459,6 +459,25 @@ map<string,string> compute_md5_fast(string dir){
 	
 }
 
+
+
+void add_copy_to_filenames(string path, set<string>& filenames){
+
+	FILE *fp;
+	stringstream command;
+	char line[SIZE_STR];
+	set<string> recent_files;
+	map<string, string> ret;
+	
+
+	set<string> files = find_files( "." + path);
+
+	for( set<string>::iterator it = files.begin(); it != files.end(); it++ ){
+		filenames.insert(it->substr(1));
+	}
+	
+}
+
 bool different_md5(string filename1, string filename2){
 	if(!exist_local_file(filename1) || !exist_local_file(filename2)) return true;
 	return md5_of_file(filename1) != md5_of_file(filename2);
@@ -998,6 +1017,9 @@ void start_working(string path){
 	string myid = unique_id();
 	map<string, string> retries = load_retries(); // file, id
 
+	if(is_in_unidirectional(path))
+		add_copy_to_filenames(path, filenames);
+
 	run_start_script(path);
 
 	for( set<string>::iterator it = filenames.begin(); it != filenames.end(); it++ ){
@@ -1038,7 +1060,8 @@ void start_working(string path){
 	retry(retries, path);
 	save_retries(retries);
 	dump_md5(compute_md5(path), path);
-	clean(path);
+	if(!is_in_unidirectional(path))
+		clean(path);
 }
 
 long stol(string str){
@@ -1152,7 +1175,8 @@ void end_working(string path){
 	set<string> computers                         = get_different_computers(); remove_id(computers, unique_id()); remove_id(computers, get_last_id(path));
 	map<string, map<string, string> > md5_remotes = load_md5s(path, computers); // file, idcomputer, md5 
 
-	fastrm(path);
+	if(!is_in_unidirectional(path))
+		fastrm(path);
 
 	run_end_script(path);
 
@@ -1198,7 +1222,8 @@ void end_working(string path){
 	save_retries(retries);
 	dump_md5(md5_local, path);
 	set_time( "spdata/md5_remote_" + crc(path) + "_" + get_last_id(path), start_time);
-	clean(path);
+	if(!is_in_unidirectional(path))
+		clean(path);
 }
 
 void setup(string path){
