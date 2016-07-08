@@ -1616,7 +1616,10 @@ int main(int argc, const char *argv[]){
 		string path=*it;
 
 		if(is_in_exclude_once(path)) continue;
-		if(is_encrypted(path)) continue;
+		if(is_encrypted(path)){
+			printf("\e[33m Is encrypted, skipping \e[0m\n");
+			continue;
+		}
 
 		if(exist_local_file(*it)){
 			printf("Path \e[34m%s\e[0m\n", path.c_str());
