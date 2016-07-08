@@ -1617,6 +1617,7 @@ int main(int argc, const char *argv[]){
 
 		if(is_in_exclude_once(path)) continue;
 		if(is_encrypted(path)){
+			printf("Path \e[34m%s\e[0m\n", path.c_str());
 			printf("\e[33m Is encrypted, skipping \e[0m\n");
 			continue;
 		}
