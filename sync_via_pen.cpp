@@ -1532,6 +1532,14 @@ void load_unidirectional(){
 	fclose ( file );
 }
 
+bool is_encrypted(string path){
+	set<string> files = find_files(path);
+	for( set<string>::iterator it = files.begin(); it != files.end(); it++ ){
+		if( (*it).find("img.img") != string::npos ) return true;
+	}
+	return false;
+}
+
 int main(int argc, const char *argv[]){
 
 	//string escaped = "/media/disk";
@@ -1608,6 +1616,7 @@ int main(int argc, const char *argv[]){
 		string path=*it;
 
 		if(is_in_exclude_once(path)) continue;
+		if(is_encrypted(path)) continue;
 
 		if(exist_local_file(*it)){
 			printf("Path \e[34m%s\e[0m\n", path.c_str());
