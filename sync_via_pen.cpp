@@ -249,6 +249,7 @@ void cpfile(string src, string dst){
 	}
 	string cpstr = (exist_local_file(dst))?"CP":"cp";
 	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 32;
+	color = (dst[0]=='.')?32:color;
 	if(src.find("spcompress") != string::npos && src[0] == '.' ) color=31;
 	printf("\e[%dm %s \e[0m %s\n",color,cpstr.c_str(), src.c_str());
 	fprintf(log_file, "\e[%dm %s \e[0m %s\n", color, cpstr.c_str(), src.c_str());
@@ -284,6 +285,7 @@ void mvfile(string src, string dst){
 	}
 	string mvstr = (exist_local_file(dst))?"MV":"mv";
 	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 33;
+	color = (dst[0]=='.')?32:color;
 	if(src.find("spcompress") != string::npos && src[0] == '.') color=31;
 	printf("\e[%dm %s \e[0m %s\n",color, mvstr.c_str(), src.c_str());
 	fprintf(log_file, "\e[%dm %s \e[0m %s\n", color, mvstr.c_str(), src.c_str());
