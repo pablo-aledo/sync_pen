@@ -237,6 +237,22 @@ bool enough_space(){
 
 }
 
+typedef struct Unidir {
+	string path;
+	string from;
+	string to;
+} Unidir;
+
+set<Unidir> unidirectionals;
+
+bool starts_with_unidirectional(string path){
+	for( set<Unidir>::iterator it = unidirectionals.begin(); it != unidirectionals.end(); it++ ){
+		if(path.substr(0, it->path.length()) == it->path) return true;
+	}
+
+	return false;
+}
+
 void cpfile(string src, string dst){
 	tox_and_detox(src);
 	tox_and_detox(dst);
@@ -249,7 +265,7 @@ void cpfile(string src, string dst){
 	}
 	string cpstr = (exist_local_file(dst))?"CP":"cp";
 	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 32;
-	color = (dst[0]=='.')?32:color;
+	if(dst[0] == '.' && !starts_with_unidirectional(src)) color = 32;
 	if(src.find("spcompress") != string::npos && src[0] == '.' ) color=31;
 	printf("\e[%dm %s \e[0m %s\n",color,cpstr.c_str(), src.c_str());
 	fprintf(log_file, "\e[%dm %s \e[0m %s\n", color, cpstr.c_str(), src.c_str());
@@ -285,7 +301,7 @@ void mvfile(string src, string dst){
 	}
 	string mvstr = (exist_local_file(dst))?"MV":"mv";
 	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 33;
-	color = (dst[0]=='.')?32:color;
+	if(dst[0] == '.' && !starts_with_unidirectional(src)) color = 32;
 	if(src.find("spcompress") != string::npos && src[0] == '.') color=31;
 	printf("\e[%dm %s \e[0m %s\n",color, mvstr.c_str(), src.c_str());
 	fprintf(log_file, "\e[%dm %s \e[0m %s\n", color, mvstr.c_str(), src.c_str());
@@ -972,14 +988,6 @@ void add_to_retry(string filename, map<string, string>& retries ){
 }
 
 
-typedef struct Unidir {
-	string path;
-	string from;
-	string to;
-} Unidir;
-
-set<Unidir> unidirectionals;
-
 inline bool operator<(const Unidir& lhs, const Unidir& rhs) {
 	return lhs.path+lhs.from+lhs.to < rhs.path+rhs.from+rhs.to;
 }
@@ -1544,13 +1552,6 @@ bool is_encrypted(string path){
 
 int main(int argc, const char *argv[]){
 
-	//string escaped = "/media/disk";
-	//escape_slash(escaped);
-	//printf("escapeslash %s\n", escaped.c_str());
-	//exit(0);
-	
-	
-	
 	if(string(argv[1]) == "meld"){
 		string file = string(argv[2]);
 		if(file.find("spcompress") == string::npos){
@@ -1574,9 +1575,6 @@ int main(int argc, const char *argv[]){
 		}
 		exit(0);
 	}
-
-	
-	
 
 	check_log();
 	start_logging();
