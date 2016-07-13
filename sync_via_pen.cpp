@@ -1211,7 +1211,7 @@ void end_working(string path){
 		//}
 		
 		
-		if( is_in_unidirectional(path) && myid == unid_from(path) && exist_local && !exist_copy )      { mvfile(filename, "." + filename); continue; }
+		if( is_in_unidirectional(path) && myid == unid_from(path) )                                    { mvfile(filename, "." + filename); continue; }
 		if( is_in_unidirectional(path) )                                                               { continue; }
 		if( is_in_retries(filename, retries) )                                                         { continue; }
 		if( is_in_compress(filename,path) )                                                            { continue; }
