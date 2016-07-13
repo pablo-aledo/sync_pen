@@ -259,7 +259,10 @@ void cpfile(string src, string dst){
 	if(match_with_ignores(src)) return;
 	if(is_in_keep(dst)){
 		if(options["fastkeep"] == "true" && exist_local_file(dst) ){
-			cpfile(dst, "." + dst);
+			if(starts_with_unidirectional(dst)){
+			} else {
+				cpfile(dst, "." + dst);
+			}
 		}
 		return;
 	}
@@ -295,7 +298,10 @@ void mvfile(string src, string dst){
 	if(match_with_ignores(src)) return;
 	if(is_in_keep(dst)){
 		if(options["fastkeep"] == "true" && exist_local_file(dst) ){
-			cpfile(dst, "." + dst);
+			if(starts_with_unidirectional(dst)){
+			} else {
+				cpfile(dst, "." + dst);
+			}
 		}
 		return;
 	}
