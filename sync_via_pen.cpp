@@ -1060,7 +1060,7 @@ void start_working(string path){
 					//still_other_different
 			//);
 		//}
-		if( is_in_unidirectional(path) && myid == unid_to(path) && !exist_local && exist_copy )                                   { mvfile("." + filename, filename); continue; }
+		if( is_in_unidirectional(path) && myid == unid_to(path) && exist_copy )                                                   { mvfile("." + filename, filename); continue; }
 		if( is_in_unidirectional(path) )                                                                                          { continue; }
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
 		if( is_in_compress(filename,path) )                                                                                       { continue; }
