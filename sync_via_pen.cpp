@@ -1654,7 +1654,7 @@ int main(int argc, const char *argv[]){
 			options["dry_run"] = "true";
 			do_compress(path);
 			end_working(path);
-			do_uncompress(path);
+			//do_uncompress(path);
 		} else if(selection == "setup"){
 			setup(path);
 		} else if(selection == "md5s"){
