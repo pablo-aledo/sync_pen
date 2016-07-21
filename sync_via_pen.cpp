@@ -1094,24 +1094,59 @@ long stol(string str){
 
 unsigned long get_epoch_last_end(string path){
 
-	if(!exist_local_file("spdata/md5_remote_" + crc(path) + "_" + unique_id()))
-		return 0;
+	if(!exist_local_file("spdata/lastend")) return 0;
 
-	FILE *fp;
-	stringstream command;
-	char ret[SIZE_STR];
+	FILE *file = fopen ( "spdata/lastend", "r" );
+	char line [ SIZE_STR ]; /* or other suitable maximum line size */
 	
-	command << "stat --format=%Y spdata/md5_remote_" + crc(path) + "_" + unique_id();
-	
-	fp = popen(command.str().c_str(), "r");
-	
-	fgets(ret,SIZE_STR, fp);
-	ret[strlen(ret)-1] = 0;
-	
-	pclose(fp);
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		string line_s = string(line);
+		string path_line = line_s.substr(0, line_s.find_last_of(" "));
+		string lastend = line_s.substr(line_s.find_last_of(" ")+1);
+		if(path_line == path ){
+			fclose ( file );
+			return stol(lastend);
+		}
+	}
+	fclose ( file );
+	return 0;
 
-	return stol(string(ret));
+}
+
+unsigned long stoul(string str){
+	unsigned long ret;
+	sscanf(str.c_str(), "%lu", &ret);
+	return ret;
+}
+
+void set_epoch_last_end(string path, unsigned long epoch ){
+
+	if(options["dry_run"] == "true") return;
+
+	if(!exist_local_file("spdata/lastend")) system("touch spdata/lastend");
+
+	map<string, unsigned long> path_to_lastend;
+	FILE *file = fopen ( "spdata/lastend", "r" );
+	char line [ SIZE_STR ]; /* or other suitable maximum line size */
 	
+	while ( fgets ( line, sizeof(line), file ) != NULL ){
+		trim(line);
+		string line_s = string(line);
+		string path_line = line_s.substr(0, line_s.find_last_of(" "));
+		string lastend = line_s.substr(line_s.find_last_of(" ")+1);
+		path_to_lastend[path_line] = stoul(lastend);
+	}
+	fclose ( file );
+
+	path_to_lastend[path] = epoch;
+
+
+	file = fopen("spdata/lastend", "w");
+	for( map<string,unsigned long>::iterator it = path_to_lastend.begin(); it != path_to_lastend.end(); it++ ){
+		fprintf(file, "%s %lu\n", it->first.c_str(), it->second);
+	}
+	fclose(file);
 }
 
 bool modified_after_epoch(string filename, unsigned long time ){
@@ -1244,6 +1279,7 @@ void end_working(string path){
 	save_retries(retries);
 	dump_md5(md5_local, path);
 	set_time( "spdata/md5_remote_" + crc(path) + "_" + get_last_id(path), start_time);
+	set_epoch_last_end(path,start_time);
 	if(!is_in_unidirectional(path))
 		clean(path);
 }
