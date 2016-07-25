@@ -298,7 +298,7 @@ void mvfile(string src, string dst){
 	if(match_with_ignores(src)) return;
 	if(is_in_keep(dst)){
 		if(options["fastkeep"] == "true" && exist_local_file(dst) ){
-			if(starts_with_unidirectional(dst)){
+			if(starts_with_unidirectional(dst) || dst[0] == '.' ){
 			} else {
 				cpfile(dst, "." + dst);
 			}
