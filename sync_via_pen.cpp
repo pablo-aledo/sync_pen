@@ -428,7 +428,7 @@ set<string> find_files(string path){
 	set<string> files;
 
 	command.str("");
-	command << "find \"" << path << "\" -type f";
+	command << "find \"" << path << "/\" -type f";
 	fp = popen(command.str().c_str(), "r");
 	while (fgets(line,SIZE_STR, fp) != NULL){
 		trim(line);
