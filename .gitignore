@@ -29,3 +29,6 @@
 
 # Target
 sync_via_pen
+
+# Vim tmp files
+*.swp
