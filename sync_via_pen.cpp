@@ -427,6 +427,8 @@ set<string> find_files(string path){
 	char line[SIZE_STR];
 	set<string> files;
 
+	if(!exist_local_file(path)) return files;
+
 	command.str("");
 	command << "find \"" << path << "/\" -type f";
 	fp = popen(command.str().c_str(), "r");
