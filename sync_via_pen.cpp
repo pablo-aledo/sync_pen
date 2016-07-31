@@ -1050,7 +1050,7 @@ void start_working(string path){
 		bool   exist_copy            = exist_local_file("." + filename);
 		bool   exist_remote          = (remote_md5 != "");
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, remote_md5 );
-		bool   eqmd5_unidir = md5_remotes[filename][unid_from(path)] == md5_remotes[filename][unid_to(path)];
+		bool   eqmd5_unidir = is_in_unidirectional(path) && md5_remotes[filename][unid_from(path)] == md5_remotes[filename][unid_to(path)];
 
 		//if(filename.find("") != string::npos){
 			//printf("%s %d %d %d %d\n",
