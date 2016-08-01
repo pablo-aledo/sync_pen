@@ -269,6 +269,7 @@ void cpfile(string src, string dst){
 	string cpstr = (exist_local_file(dst))?"CP":"cp";
 	int color = options["colors"]=="gr"? exist_local_file(dst)?31:32 : 32;
 	if(dst[0] == '.' && !starts_with_unidirectional(src)) color = 32;
+	if(dst[0] == '.' && starts_with_unidirectional(src) && options["safe_unid"] == "true" ) color = 32;
 	if(src.find("spcompress") != string::npos && src[0] == '.' ) color=31;
 	printf("\e[%dm %s \e[0m %s\n",color,cpstr.c_str(), src.c_str());
 	fprintf(log_file, "\e[%dm %s \e[0m %s\n", color, cpstr.c_str(), src.c_str());
