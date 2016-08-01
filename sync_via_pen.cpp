@@ -1052,7 +1052,7 @@ void start_working(string path){
 		bool   exist_copy            = exist_local_file("." + filename);
 		bool   exist_remote          = (remote_md5 != "");
 		bool   still_other_different = find_one_different_of( md5_remotes[filename],computers, remote_md5 );
-		bool   eqmd5_unidir = is_in_unidirectional(path) && md5_remotes[filename][unid_from(path)] == md5_remotes[filename][unid_to(path)];
+		bool   eqmd5_unidir = is_in_unidirectional(path) && md5_local[filename] == md5_remotes[filename][unid_to(path)];
 
 		//if(filename.find("") != string::npos){
 			//printf("%s %d %d %d %d\n",
@@ -1063,8 +1063,9 @@ void start_working(string path){
 					//still_other_different
 			//);
 		//}
-		if( is_in_unidirectional(path) && myid == unid_to(path) && exist_copy )                                                   { mvfile("." + filename, filename); continue; }
-		if( is_in_unidirectional(path) && eqmd5_unidir && myid == unid_from(path) && options["safe_unid"] == "true" )             { rmfile(filename); continue; }
+
+		if( is_in_unidirectional(path) && myid == unid_to(path) && exist_copy )                                                        { mvfile("." + filename, filename); continue; }
+		if( is_in_unidirectional(path) && eqmd5_unidir && myid == unid_from(path) && options["safe_unid"] == "true" && exist_local )   { rmfile(filename); continue; }
 		if( is_in_unidirectional(path) )                                                                                          { continue; }
 		if( is_in_retries(filename, retries) )                                                                                    { continue; }
 		if( is_in_compress(filename,path) )                                                                                       { continue; }
