@@ -648,7 +648,7 @@ void add_to_md5_if_not_exists(map<string, string>& map1, map<string, string> map
 
 void dump_md5(map<string, string> md5s, string path){
 
-	if(options["dry_run"] == "true") return;
+	//if(options["dry_run"] == "true") return;
 
 	add_to_md5_if_not_exists(md5s, compress_md5s);
 
