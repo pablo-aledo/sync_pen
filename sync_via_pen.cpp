@@ -1043,6 +1043,11 @@ void start_working(string path){
 	if(is_in_unidirectional(path))
 		add_copy_to_filenames(path, filenames);
 
+	if(is_in_unidirectional(path)){
+		set<string> computers                         = get_different_computers();
+		md5_remotes = load_md5s(path, computers); // file, idcomputer, md5
+	}
+
 	run_start_script(path);
 
 	for( set<string>::iterator it = filenames.begin(); it != filenames.end(); it++ ){
