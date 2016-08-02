@@ -1272,6 +1272,7 @@ void end_working(string path){
 		
 		
 		if( is_in_unidirectional(path) && myid == unid_from(path) && options["safe_unid"] == "true" && modified_after_epoch(filename, epoch_last_end) )  { cpfile(filename, "." + filename); continue; }
+		if( is_in_unidirectional(path) && myid == unid_from(path) && options["safe_unid"] == "true" && !exist_copy )  { cpfile(filename, "." + filename); continue; }
 		if( is_in_unidirectional(path) && myid == unid_from(path) && options["safe_unid"] == "false" ) { mvfile(filename, "." + filename); continue; }
 		if( is_in_unidirectional(path) )                                                               { continue; }
 		if( is_in_retries(filename, retries) )                                                         { continue; }
