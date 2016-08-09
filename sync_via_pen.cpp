@@ -40,6 +40,7 @@ set<string> keep;
 set<string> compress;
 map<string,string> compress_md5s;
 bool notify_end = false;
+string difftool = "meld";
 
 bool match_with_ignores(string line){
 
@@ -1608,10 +1609,14 @@ bool is_encrypted(string path){
 
 int main(int argc, const char *argv[]){
 
-	if(string(argv[1]) == "meld"){
+	if(string(argv[1]) == "meld") difftool = "meld";
+	if(string(argv[1]) == "diff") difftool = "diff";
+
+
+	if(string(argv[1]) == "meld" || string(argv[1]) == "diff"){
 		string file = string(argv[2]);
 		if(file.find("spcompress") == string::npos){
-			system(("meld " + file + " " + equiv(file)).c_str());
+			system((difftool + " " + file + " " + equiv(file)).c_str());
 		} else {
 
 			string route = file.substr(1, file.find_last_of("/"));
@@ -1625,7 +1630,7 @@ int main(int argc, const char *argv[]){
 			command << "PTH=$PWD;";
 			command << "mkdir /tmp/spcompress 2>/dev/null; rm -rf /tmp/spcompress/*;";
 			command << "cd /tmp/spcompress/; tar -xjf $PTH/" << "/" << file << ";";
-			command << "meld " << route2 << " " << route << "/" << route2 << ";";
+			command << difftool << " " << route2 << " " << route << "/" << route2 << ";";
 			system( command.str().c_str() );
 
 		}
