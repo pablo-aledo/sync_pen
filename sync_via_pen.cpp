@@ -880,25 +880,27 @@ void clean(string path){
 	FILE *fp;
 	stringstream command;
 	char ret[SIZE_STR];
-	
-	command << "find " << ".\"" + path + "\" -type f 2>/dev/null";
-	
-	fp = popen(command.str().c_str(), "r");
-	
-	while (fgets(ret,SIZE_STR, fp) != NULL){
-		trim(ret);
-		string ret_s = string(ret);
-		string filename = ret_s.substr(1);
-		escape(filename);
-		tox_and_detox(filename);
-		if( !find_one_different_of( md5s[filename],computers, md5s[filename][unique_id()]) ){
-			rmfile("." + filename);
+
+	if(!is_in_unidirectional(path)){
+		command << "find " << ".\"" + path + "\" -type f 2>/dev/null";
+
+		fp = popen(command.str().c_str(), "r");
+
+		while (fgets(ret,SIZE_STR, fp) != NULL){
+			trim(ret);
+			string ret_s = string(ret);
+			string filename = ret_s.substr(1);
+			escape(filename);
+			tox_and_detox(filename);
+			if( !find_one_different_of( md5s[filename],computers, md5s[filename][unique_id()]) ){
+				rmfile("." + filename);
+			}
+
 		}
 
+		pclose(fp);
 	}
-	
-	pclose(fp);
-	
+
 	for ( unsigned int i = 0; i < 10; i++) {
 		system(("find .\"" + path + "\" -mindepth 1 -type d -empty -delete 2>/dev/null").c_str());
 	}
