@@ -1026,10 +1026,6 @@ string unid_from(string path){
 
 }
 
-void remove_empty_folders(string dir){
-	system(("find \"" + dir + "\" -empty -delete").c_str());
-}
-
 void start_working(string path){
 
 	map<string, string> md5_local                 = compute_md5(path);
@@ -1092,10 +1088,7 @@ void start_working(string path){
 	retry(retries, path);
 	save_retries(retries);
 	dump_md5(compute_md5(path), path);
-	if(!is_in_unidirectional(path))
-		clean(path);
-	if(is_in_unidirectional(path))
-		remove_empty_folders("." + path);
+	clean(path);
 }
 
 long stol(string str){
@@ -1294,8 +1287,7 @@ void end_working(string path){
 	dump_md5(md5_local, path);
 	set_time( "spdata/md5_remote_" + crc(path) + "_" + get_last_id(path), start_time);
 	set_epoch_last_end(path,start_time);
-	if(!is_in_unidirectional(path))
-		clean(path);
+	clean(path);
 }
 
 void setup(string path){
