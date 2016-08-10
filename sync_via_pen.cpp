@@ -863,6 +863,14 @@ bool find_one_different_of(map<string, string> md5s, set<string> computers, stri
 	return false;
 }
 
+bool is_in_unidirectional(string path){
+	for( set<Unidir>::iterator it = unidirectionals.begin(); it != unidirectionals.end(); it++ ){
+		if(it->path == path) return true;
+	}
+
+	return false;
+}
+
 void clean(string path){
 
 	if(options["dry_run"] == "true") return;
@@ -1002,16 +1010,6 @@ void add_to_retry(string filename, map<string, string>& retries ){
 
 inline bool operator<(const Unidir& lhs, const Unidir& rhs) {
 	return lhs.path+lhs.from+lhs.to < rhs.path+rhs.from+rhs.to;
-}
-
-
-
-bool is_in_unidirectional(string path){
-	for( set<Unidir>::iterator it = unidirectionals.begin(); it != unidirectionals.end(); it++ ){
-		if(it->path == path) return true;
-	}
-
-	return false;
 }
 
 string unid_to(string path){
