@@ -1029,6 +1029,7 @@ string unid_from(string path){
 void start_working(string path){
 
 	map<string, string> md5_local                 = compute_md5(path);
+	map<string, string> md5_copy;
 	map<string, string> md5_remote_latest         = load_md5_latest(path); // file, md5
 	set<string> filenames                         = get_filenames(md5_local, md5_remote_latest);
 	set<string> computers                         = get_different_computers(); remove_id(computers, unique_id()); remove_id(computers, get_last_id(path));
@@ -1036,6 +1037,10 @@ void start_working(string path){
 	string lastid                                 = get_last_id(path);
 	string myid = unique_id();
 	map<string, string> retries = load_retries(); // file, id
+
+	if( options["md5_copy"] == "true" ){
+	       md5_copy = compute_md5("." + path);
+	}
 
 	if(is_in_unidirectional(path))
 		add_copy_to_filenames(path, filenames);
@@ -1051,6 +1056,7 @@ void start_working(string path){
 		string filename              = *it;
 		string remote_md5            = md5_remote_latest[filename];
 		string local_md5             = md5_local[filename];
+		string copy_md5              = md5_copy["." + filename];
 		bool   exist_local           = (local_md5 != "");
 		bool   exist_copy            = exist_local_file("." + filename);
 		bool   exist_remote          = (remote_md5 != "");
@@ -1067,6 +1073,7 @@ void start_working(string path){
 			//);
 		//}
 
+		if( is_in_unidirectional(path) && myid == unid_to(path) && exist_copy && copy_md5 == local_md5 )                               { rmfile("." + filename); continue; }
 		if( is_in_unidirectional(path) && myid == unid_to(path) && exist_copy )                                                        { mvfile("." + filename, filename); continue; }
 		if( is_in_unidirectional(path) && eqmd5_unidir && myid == unid_from(path) && options["safe_unid"] == "true" && exist_local )   { rmfile(filename); continue; }
 		if( is_in_unidirectional(path) )                                                                                          { continue; }
@@ -1317,6 +1324,7 @@ void load_config(){
 	options["fastrm"] = "true";
 	options["colors"] = "gr";
 	options["safe_unid"] = "true";
+	options["md5_copy"] = "true";
 	//if(!exist_local_file("spdata/config")) return;
 	//FILE *file = fopen ( "spdata/config", "r" );
 	//char line [ SIZE_STR ]; [> or other suitable maximum line size <]
