@@ -1038,8 +1038,9 @@ void start_working(string path){
 	string myid = unique_id();
 	map<string, string> retries = load_retries(); // file, id
 
-	if( options["md5_copy"] == "true" ){
-	       md5_copy = compute_md5("." + path);
+	if( options["md5_copy"] == "true" && is_in_unidirectional(path) ){
+		md5_copy = compute_md5("." + path);
+		dump_md5(md5_copy, "." + path);
 	}
 
 	if(is_in_unidirectional(path))
