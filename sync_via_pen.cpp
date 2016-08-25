@@ -327,7 +327,7 @@ void mvfile(string src, string dst){
 void rmfile(string file){
 	tox_and_detox(file);
 	if(match_with_ignores(file)) return;
-	if(is_in_keep(file)){
+	if(file[0] != '.' && is_in_keep(file)){
 		if(options["fastkeep"] == "true" && exist_local_file(file) ){
 			cpfile(file, "." + file);
 		}
